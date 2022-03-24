@@ -3,8 +3,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+.DS_Store
+
 # C extensions
 *.so
+
+*.mp4
+*.mov
+*.pickle
+*.png
+*.jpeg
+*.npz
+*.npy
 
 # Distribution / packaging
 .Python
