@@ -1,0 +1,5 @@
+pyelastica>=0.2.2.post2
+numpy
+numba
+matplotlib
+tqdm
