@@ -4,7 +4,7 @@ Created on Feb. 21, 2021
 """
 
 import numpy as np
-from povray.povray_base import POVRAYBase
+from comm.povray.povray_base import POVRAYBase
 
 class POVRAYRod(POVRAYBase):
     def __init__(self, **kwargs):

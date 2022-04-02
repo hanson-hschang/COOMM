@@ -6,7 +6,7 @@ Created on Nov. 14, 2021
 from tqdm import tqdm
 import numpy as np
 
-from algorithms.algorithm import Algorithm
+from comm.algorithms.algorithm import Algorithm
 
 class ForwardBackward(Algorithm):
     def __init__(self, rod, algo_config, **kwargs):

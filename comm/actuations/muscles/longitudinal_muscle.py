@@ -6,7 +6,7 @@ Created on Oct. 15, 2021
 import numpy as np
 from numba import njit
 
-from actuations.muscles.muscle import MuscleForce
+from comm.actuations.muscles.muscle import MuscleForce
 
 class LongitudinalMuscle(MuscleForce):
     def __init__(

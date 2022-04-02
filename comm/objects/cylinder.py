@@ -5,8 +5,8 @@ Created on Mar. 8, 2022
 
 import numpy as np
 
-from objects.object import Object
-from objects.target import Target
+from comm.objects.object import Object
+from comm.objects.target import Target
 
 class Cylinder(Object):
     def __init__(self, position, director, radius, length, n_elements, cost_weight):
