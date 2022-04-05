@@ -5,8 +5,8 @@ Created on Nov. 16, 2021
 
 import numpy as np
 
-from objects.object import Object
-from objects.target import Target
+from comm.objects.object import Object
+from comm.objects.target import Target
 
 class Point(Object):
     def __init__(self, position, director, n_elements, cost_weight):

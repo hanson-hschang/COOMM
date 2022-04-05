@@ -10,9 +10,9 @@ from tqdm import tqdm
 
 from elastica._linalg import _batch_matvec, _batch_cross
 from elastica._calculus import quadrature_kernel
-from elastica._elastica_numba._external_forces import inplace_addition
-from algorithms.forward_backward import ForwardBackward
-from _rod_tool import (
+from elastica.external_forces import inplace_addition
+from comm.algorithms.forward_backward import ForwardBackward
+from comm._rod_tool import (
     inverse,
     _lab_to_material,
     _material_to_lab,

@@ -4,10 +4,9 @@ Created on Nov. 16, 2021
 """
 
 import numpy as np
-from examples.ActuationModel.objects.object import Objects
 
-from objects.object import Object
-from objects.target import Target
+from comm.objects.object import Object
+from comm.objects.target import Target
 
 class DirectorConstraint(Object, Target):
     def __init__(self, director, n_elements, cost_weight, target_cost_weight, **kwargs):

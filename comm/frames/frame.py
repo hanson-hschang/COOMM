@@ -7,7 +7,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
-from _rendering_tool import check_folder
+from comm._rendering_tool import check_folder
 
 class FrameBase(object):
     def __init__(self, file_dict, fig_dict, gs_dict):

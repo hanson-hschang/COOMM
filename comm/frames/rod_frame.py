@@ -7,12 +7,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from frames.frame import FrameBase
-from frames.frame_tools import (
+from comm.frames.frame import FrameBase
+from comm.frames.frame_tools import (
     base_colors, 
     default_label_fontsize,
 )
-from _rendering_tool import (
+from comm._rendering_tool import (
     process_position, process_director
 )
 

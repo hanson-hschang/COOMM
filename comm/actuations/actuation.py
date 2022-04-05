@@ -8,11 +8,11 @@ from numba import njit
 
 from elastica._linalg import _batch_cross
 from elastica._calculus import quadrature_kernel, difference_kernel
-from elastica._elastica_numba._external_forces import inplace_addition
+from elastica.external_forces import inplace_addition
 
 from elastica.external_forces import NoForces
 
-from _rod_tool import _lab_to_material, _material_to_lab, average2D
+from comm._rod_tool import _lab_to_material, _material_to_lab, average2D
 
 @njit(cache=True)
 def _internal_to_external_load(
