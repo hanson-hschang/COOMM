@@ -1,6 +1,5 @@
-"""
-Created on Dec. 21, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Processing scripts for the rendering
 """
 
 import os, shutil
