@@ -57,10 +57,10 @@ class ContinuousActuation:
         self.internal_couple = np.zeros((3, n_elements-1))    # material frame
         self.external_couple = np.zeros((3, n_elements))      # material frame
 
-def reset_actuation(self,):
-    """
-    Set actuation force/torques to be zero.
-    """
+    def reset_actuation(self,):
+        """
+        Set actuation force/torques to be zero.
+        """
         self.internal_force[:, :] *= 0
         self.external_force[:, :] *= 0
         self.internal_couple[:, :] *= 0
