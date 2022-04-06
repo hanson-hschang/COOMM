@@ -18,6 +18,7 @@ Welcome to COMM's documentation!
 
    api/actuation
    api/algorithms
+   api/forces
 
 Indices and tables
 ==================
