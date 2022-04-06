@@ -5,7 +5,7 @@ Created on Dec. 02, 2021
 
 import numpy as np
 
-class Object(object):
+class Object:  # FIXME: To general name.
     def __init__(self, n_elements, cost_weight=None):
         self.n_elements = n_elements
         self.cost = Cost(n_elements)

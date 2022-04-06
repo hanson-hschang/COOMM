@@ -131,7 +131,7 @@ def kappa_to_curvature(kappa, voronoi_dilatation):
         curvature[2, n] = kappa[2, n] / voronoi_dilatation[n]
     return curvature
 
-class StaticRod(object):
+class StaticRod:
     def __init__(
             self, rest_position, rest_director, rest_radius, shear_matrix, bend_matrix
         ):

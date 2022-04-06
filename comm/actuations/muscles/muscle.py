@@ -41,7 +41,7 @@ def force_length_weight_poly(muscle_length, f_l_coefficients=np.array([-6.44, 18
         force_weight[i] = 0 if (force_weight[i]<0) or (muscle_length[i]>2) else force_weight[i]
     return force_weight
 
-class MuscleInfo(object):
+class MuscleInfo:
     def __init__(self, type_name, index, **kwargs):
         self.type_name = type_name
         self.index = index

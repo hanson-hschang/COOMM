@@ -6,7 +6,7 @@ Created on Nov. 14, 2021
 import numpy as np
 from comm._rod_tool import StaticRod
 
-class Algorithm(object):
+class Algorithm:
     def __init__(self, rod, algo_config):
 
         self.static_rod = StaticRod.get_rod(rod)
