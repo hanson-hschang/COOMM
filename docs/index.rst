@@ -15,6 +15,7 @@ Welcome to COMM's documentation!
    :caption: API:
 
    api/actuation
+   api/algorithms
 
 Indices and tables
 ==================

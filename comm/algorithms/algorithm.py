@@ -1,13 +1,22 @@
-"""
-Created on Nov. 14, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Base algorithm class
 """
 
 import numpy as np
 from comm._rod_tool import StaticRod
 
-class Algorithm:
+class Algorithm:  # TODO: maybe rename the class??
+    """Algorithm.
+    """
+
     def __init__(self, rod, algo_config):
+        """__init__.
+
+        Parameters
+        ----------
+        rod :
+        algo_config :
+        """
 
         self.static_rod = StaticRod.get_rod(rod)
         self.config = algo_config
@@ -20,4 +29,10 @@ class Algorithm:
         self.s_kappa = self.s[1:-1]
 
     def run(self, **kwargs):
+        """run.
+
+        Parameters
+        ----------
+        kwargs :
+        """
         raise NotImplementedError

@@ -1,16 +1,17 @@
-"""
-Created on Nov. 14, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Forward Backward Muscle model implementation.
 """
 
 from os import stat
 import numpy as np
 from numba import njit
+
 from tqdm import tqdm
 
 from elastica._linalg import _batch_matvec, _batch_cross
 from elastica._calculus import quadrature_kernel
 from elastica.external_forces import inplace_addition
+
 from comm.algorithms.forward_backward import ForwardBackward
 from comm._rod_tool import (
     inverse,
@@ -22,7 +23,18 @@ from comm._rod_tool import (
 )
 
 class ForwardBackwardMuscle(ForwardBackward):
+    """ForwardBackwardMuscle.
+    """
+
     def __init__(self, rod, muscles, algo_config, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        rod :
+        muscles :
+        algo_config :
+        """
         ForwardBackward.__init__(self, rod, algo_config, **kwargs)
         self.activation_diff_tolerance = self.config['activation_diff_tolerance']
         self.muscles = muscles
@@ -35,10 +47,25 @@ class ForwardBackwardMuscle(ForwardBackward):
             self.prev_activations.append(np.full(muscle.activation.shape, np.inf))
 
     def save_to_prev_activations(self, activations):
+        """save_to_prev_activations.
+
+        Parameters
+        ----------
+        activations :
+        """
         for i in range(len(self.prev_activations)):
             self.prev_activations[i] = activations[i].copy()
 
     def update(self, iteration):
+        """update.
+
+        Parameters
+        ----------
+        iteration :
+
+        Returns
+        -------
+        """
         self.save_to_prev_activations(self.activations)
 
         # find the equlibrium for the current muscle activations
@@ -86,7 +113,14 @@ class ForwardBackwardMuscle(ForwardBackward):
 
         return ForwardBackward.update(self, iteration)
 
-    def calculate_total_muscle_forces_couples(self,):
+    def calculate_total_muscle_forces_couples(self):
+        """calculate_total_muscle_forces_couples.
+
+        Returns
+        -------
+        muscle_forces:
+        muscle_couples:
+        """
 
         muscle_forces = np.zeros(self.static_rod.sigma.shape)
         muscle_couples = np.zeros(self.static_rod.kappa.shape)
@@ -175,7 +209,9 @@ class ForwardBackwardMuscle(ForwardBackward):
             _lab_to_material(director, internal_couple_lab_frame)
         )
 
-    def find_target_activations(self,):
+    def find_target_activations(self):
+        """find_target_activations.
+        """
         target_activations = []
         for muscle in self.muscles:
             muscle.apply_activation(np.ones(muscle.activation.shape))
@@ -225,11 +261,22 @@ class ForwardBackwardMuscle(ForwardBackward):
         return target_activation
 
     def update_activations(self, target_activations):
+        """update_activations.
+
+        Parameters
+        ----------
+        target_activations :
+        """
         for activation, target_activation, in zip(self.activations, target_activations):
             activation[:] -= self.stepsize * (activation - target_activation)
             activation[:] = np.clip(activation, 0, 1)
 
-    def check_activations_difference(self,):
+    def check_activations_difference(self):
+        """check_activations_difference
+
+        Returns
+        -------
+        """
         norm = 0
         for prev_activation, activation in zip(self.prev_activations, self.activations):
             norm += np.sum((activation-prev_activation)**2)/activation.shape[0]

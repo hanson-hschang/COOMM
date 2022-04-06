@@ -1,6 +1,6 @@
-****************
-Actuation Module
-****************
+*********
+Actuation
+*********
 
 Base Modules
 ------------
