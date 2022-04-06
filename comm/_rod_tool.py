@@ -4,7 +4,6 @@ Created on Sep. 23, 2021
 """
 
 import sys
-sys.path.append("../../")   # include elastica-python directory
 
 import numpy as np
 from numba import njit
@@ -12,9 +11,6 @@ from numba import njit
 from elastica._linalg import _batch_matvec, _batch_norm
 from elastica._calculus import _difference, _average
 from elastica._rotations import _get_rotation_matrix, _inv_rotate
-
-position_difference_kernel = _difference
-position_average = _average
 
 @njit(cache=True)
 def inverse(matrix_collection):
@@ -143,7 +139,7 @@ class StaticRod:
         
         self.rest_radius = rest_radius.copy()
         self.rest_lengths = _batch_norm(
-            position_difference_kernel(self.position_collection)
+            _difference(self.position_collection)  # Position difference
         )
         self.rest_voronoi_lengths = 0.5 * (
             self.rest_lengths[1:] + self.rest_lengths[:-1]
@@ -228,7 +224,7 @@ class StaticRod:
             dilatation[k] = lengths[k] / rest_lengths[k]
 
         # Cmopute eq (3.4) from 2018 RSOS paper
-        voronoi_lengths = position_average(lengths)
+        voronoi_lengths = _average(lengths)  # Position average
 
         # Cmopute eq (3.5) from 2018 RSOS paper
         for k in range(voronoi_lengths.shape[0]):
@@ -240,7 +236,7 @@ class StaticRod:
         position_collection, rest_lengths, rest_radius, lengths, tangents, radius
     ):
         # Compute eq (3.3) from 2018 RSOS paper
-        position_diff = position_difference_kernel(position_collection)
+        position_diff = _difference(position_collection)  # Position difference
         lengths[:] = _batch_norm(position_diff)
         for k in range(lengths.shape[0]):
             tangents[0, k] = position_diff[0, k] / lengths[k]
