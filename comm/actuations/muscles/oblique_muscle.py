@@ -1,6 +1,5 @@
-"""
-Created on Oct. 15, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ """
+Oblique muscle implementation.
 """
 
 import numpy as np
@@ -9,6 +8,9 @@ from numba import njit
 from comm.actuations.muscles.muscle import MuscleForce
 
 class ObliqueMuscle(MuscleForce):
+    """ObliqueMuscle.
+    """
+
     def __init__(
         self,
         muscle_init_angle,
@@ -18,6 +20,16 @@ class ObliqueMuscle(MuscleForce):
         max_muscle_stress,
         **kwargs
     ):
+        """__init__.
+
+        Parameters
+        ----------
+        muscle_init_angle :
+        ratio_muscle_position :
+        rotation_number :
+        rest_muscle_area :
+        max_muscle_stress :
+        """
         n_elem = rest_muscle_area.shape[0]
         s = np.linspace(0, 1, n_elem+1)
         s_muscle_position = (s[:-1]+s[1:])/2

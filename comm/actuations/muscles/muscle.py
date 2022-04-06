@@ -1,6 +1,5 @@
-"""
-Created on Oct. 13, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Muscle base class implementation.
 """
 
 from collections import defaultdict
@@ -50,7 +49,17 @@ class MuscleInfo:
         return "{}_".format(self.index) + self.type_name
 
 class Muscle(ContinuousActuation, MuscleInfo):
+    """Muscle base class 
+    """
+
     def __init__(self, ratio_muscle_position, rest_muscle_area, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        ratio_muscle_position :
+        rest_muscle_area :
+        """
         self.n_elements = rest_muscle_area.shape[0]
         self.s = np.linspace(0, 1, self.n_elements+1)
         ContinuousActuation.__init__(self, self.n_elements)
@@ -87,6 +96,12 @@ class Muscle(ContinuousActuation, MuscleInfo):
         )
 
     def set_current_length_as_rest_length(self, system):
+        """set_current_length_as_rest_length.
+
+        Parameters
+        ----------
+        system :
+        """
         Muscle.__call__(self, system)
         self.calculate_muscle_length(
             self.muscle_length, self.muscle_strain
@@ -159,10 +174,22 @@ class Muscle(ContinuousActuation, MuscleInfo):
         )
 
 class MuscleForce(Muscle):
+    """MuscleForce
+    """
+
     def __init__(self, 
         ratio_muscle_position, rest_muscle_area, 
         max_muscle_stress, **kwargs
     ):
+        """
+        Muscle force class implementation
+
+        Parameters
+        ----------
+        ratio_muscle_position :
+        rest_muscle_area :
+        max_muscle_stress :
+        """
         kwargs.setdefault("muscle_type", "muscle_force")
         Muscle.__init__(
             self, ratio_muscle_position, rest_muscle_area, **kwargs
@@ -245,7 +272,16 @@ class MuscleForce(Muscle):
         return self.activation
 
 class MuscleGroup(ContinuousActuation, MuscleInfo):
+    """MuscleGroup.
+    """
+
     def __init__(self, muscles, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        muscles :
+        """
         ContinuousActuation.__init__(self, muscles[0].n_elements)
         MuscleInfo.__init__(self,
             type_name=kwargs.get("type_name", "muscle_group"),
@@ -275,10 +311,22 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
             )
 
     def set_current_length_as_rest_length(self, system):
+        """set_current_length_as_rest_length.
+
+        Parameters
+        ----------
+        system :
+        """
         for muscle in self.muscles:
             muscle.set_current_length_as_rest_length(system)
 
     def apply_activation(self, activation):
+        """apply_activation.
+
+        Parameters
+        ----------
+        activation :
+        """
         self.set_activation(self.activation, activation.copy())
         for muscle in self.muscles:
             muscle.set_activation(muscle.activation, self.activation.copy())
@@ -292,9 +340,20 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
         return self.activation
 
 class ApplyMuscles(ApplyActuations):
+    """ApplyMuscles.
+    """
+
     def __init__(self, muscles, 
         step_skip: int, callback_params_list: list
     ):
+        """__init__.
+
+        Parameters
+        ----------
+        muscles :
+        step_skip : int
+        callback_params_list : list
+        """
         ApplyActuations.__init__(
             self, muscles, step_skip, callback_params_list
         )
@@ -302,6 +361,13 @@ class ApplyMuscles(ApplyActuations):
             muscle.index = m
 
     def callback_func(self, muscles, callback_params_list):
+        """callback_func.
+
+        Parameters
+        ----------
+        muscles :
+        callback_params_list :
+        """
         for muscle, callback_params in zip(
             muscles, callback_params_list
         ):
@@ -343,9 +409,20 @@ class ApplyMuscles(ApplyActuations):
             )
 
 class ApplyMuscleGroups(ApplyMuscles):
+    """ApplyMuscleGroups.
+    """
+
     def __init__(self, muscle_groups, 
         step_skip: int, callback_params_list: list
     ):
+        """__init__.
+
+        Parameters
+        ----------
+        muscle_groups :
+        step_skip : int
+        callback_params_list : list
+        """
         ApplyMuscles.__init__(
             self, muscle_groups, step_skip, callback_params_list
         )
@@ -358,6 +435,13 @@ class ApplyMuscleGroups(ApplyMuscles):
             
 
     def callback_func(self, muscle_groups, callback_params_list):
+        """callback_func.
+
+        Parameters
+        ----------
+        muscle_groups :
+        callback_params_list :
+        """
         for muscle_group, callback_params in zip(
             muscle_groups, callback_params_list
         ):
