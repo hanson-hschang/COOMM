@@ -277,13 +277,13 @@ class RodFrame(FrameBase):
             self.ax_main.set_zlim(z_lim)
 
     def set_labels(self, time=None):
-        if time is not None:
         """set_labels.
-
+        
         Parameters
         ----------
         time :
         """
+        if time is not None:
             self.ax_main.set_title(
                 "time={:.2f} [sec]".format(time), 
                 fontsize=self.fontsize
