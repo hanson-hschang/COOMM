@@ -1,6 +1,5 @@
-"""
-Created on Nov. 16, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Director constraint object implementation
 """
 
 import numpy as np
@@ -9,7 +8,25 @@ from comm.objects.object import Object
 from comm.objects.target import Target
 
 class DirectorConstraint(Object, Target):
+    """DirectorConstraint.
+    """
+
     def __init__(self, director, n_elements, cost_weight, target_cost_weight, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        director :
+            director
+        n_elements :
+            n_elements
+        cost_weight :
+            cost_weight
+        target_cost_weight :
+            target_cost_weight
+        kwargs :
+            kwargs
+        """
         Object.__init__(self, n_elements, cost_weight)
         Target.__init__(self, target_cost_weight)
         self.director = director.copy()
@@ -20,12 +37,30 @@ class DirectorConstraint(Object, Target):
         #         self.director_flags[i] = False
 
     def update_constraint(self, target_director, director):
+        """update_constraint.
+
+        Parameters
+        ----------
+        target_director :
+            target_director
+        director :
+            director
+        """
         self.update_director(target_director, director)
 
     # def update_position(self, position):
     #     self.position = position.copy()
 
     def update_director(self, target_director, director):
+        """update_director.
+
+        Parameters
+        ----------
+        target_director :
+            target_director
+        director :
+            director
+        """
         # for i, director_flag in enumerate(self.director_flags):
         #     self.director[i, :] = (
         #         target_director[i, :].copy() if director_flag else director[i, :].copy()
@@ -41,9 +76,23 @@ class DirectorConstraint(Object, Target):
     #     )
 
     def calculate_continuous_cost_gradient_wrt_position(self, **kwargs):
+        """calculate_continuous_cost_gradient_wrt_position.
+
+        Parameters
+        ----------
+        kwargs :
+            kwargs
+        """
         pass
     
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
+        """calculate_continuous_cost_gradient_wrt_director.
+
+        Parameters
+        ----------
+        kwargs :
+            kwargs
+        """
         director = kwargs['director'].copy()
         vector = np.zeros((3, self.n_elements))
         skew_symmetric_matrix = (
@@ -64,11 +113,26 @@ class DirectorConstraint(Object, Target):
         # print(vector)
     
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
+        """calculate_discrete_cost_gradient_wrt_position.
+
+        Parameters
+        ----------
+        kwargs :
+            kwargs
+        """
         pass
     
     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
+        """calculate_discrete_cost_gradient_wrt_director.
+
+        Parameters
+        ----------
+        kwargs :
+            kwargs
+        """
         pass
 
+# TODO: What is this? Do we want to include or remove?
 # class PointTarget(Point, Target):
 #     def __init__(self, position, director, n_elements, cost_weight, target_cost_weight, **kwargs):
 #         Point.__init__(self, position, director, n_elements, cost_weight)
