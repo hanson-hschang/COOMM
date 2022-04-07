@@ -1,6 +1,5 @@
-"""
-Created on Sep. 23, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Frame base class
 """
 
 import os
@@ -10,7 +9,18 @@ from matplotlib import gridspec
 from comm._rendering_tool import check_folder
 
 class FrameBase:
+    """FrameBase.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict):
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
         self.figure_name = file_dict["figure_name"]
         self.folder_name = file_dict.get("folder_name", None)
         self.frame_count = 0
@@ -24,6 +34,8 @@ class FrameBase:
             file_dict['check_folder_flag'] = False
 
     def reset(self):
+        """reset.
+        """
         if self.fig is None:
             self.fig = plt.figure(**self.fig_dict)
             self.gs = gridspec.GridSpec(
@@ -32,9 +44,18 @@ class FrameBase:
             )
 
     def show(self,):
+        """show.
+        """
         plt.show()
 
     def save(self, show=False, frame_count=None):
+        """save.
+
+        Parameters
+        ----------
+        show :
+        frame_count :
+        """
         if self.folder_name is None:
             self.fig.savefig(self.figure_name)
         else:
@@ -54,6 +75,14 @@ class FrameBase:
         self.gs = None
 
     def movie(self, frame_rate, movie_name, start_number=0):
+        """movie.
+
+        Parameters
+        ----------
+        frame_rate :
+        movie_name :
+        start_number :
+        """
         print("Creating movie:", movie_name+".mov")
         cmd = "ffmpeg -r {}".format(frame_rate)
         figure_name = self.figure_name.replace("{:", "%")
@@ -64,4 +93,5 @@ class FrameBase:
         cmd += " -y " + movie_name + ".mov"
         os.system(cmd)
 
+# TODO: What is this??
 # -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2"

@@ -1,6 +1,5 @@
-"""
-Created on Oct. 15, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Transverse muscle implementation
 """
 
 import numpy as np
@@ -9,12 +8,22 @@ from numba import njit
 from comm.actuations.muscles.muscle import MuscleForce
 
 class TransverseMuscle(MuscleForce):
+    """TransverseMuscle.
+    """
+
     def __init__(
         self,
         rest_muscle_area,
         max_muscle_stress,
         **kwargs
     ):
+        """__init__.
+
+        Parameters
+        ----------
+        rest_muscle_area :
+        max_muscle_stress :
+        """
         n_elem = rest_muscle_area.shape[0]
         kwargs.setdefault("type_name", "TM")
         MuscleForce.__init__(

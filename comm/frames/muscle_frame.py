@@ -1,6 +1,5 @@
-"""
-Created on Oct. 21, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Muscle frame imple
 """
 
 import numpy as np
@@ -25,6 +24,7 @@ from comm._rendering_tool import (
 # TODO: plot muscles in the ax_main, which needs 
 # process_position and process_director from frame_tools
 
+# TODO: Maybe combine default color/parameters into class?
 muscle_length_color = default_colors['tab:brown']
 muscle_force_weight_color = default_colors['tab:blue']
 
@@ -36,8 +36,19 @@ muscles_color = dict(
 
 
 class MuscleFrameBase(FrameBase):
+    """MuscleFrameBase.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):
-        FrameBase.__init__(
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
+        FrameBase.__init__( # Try to use super
             self,
             file_dict=file_dict,
             fig_dict=fig_dict,
@@ -47,7 +58,7 @@ class MuscleFrameBase(FrameBase):
         self.fontsize = kwargs.get("fontsize", default_label_fontsize)
         self.offset = kwargs.get("offset", np.zeros(3))
         self.rotation = kwargs.get("rotation", np.identity(3))
-        MuscleFrameBase.set_ref_setting(
+        MuscleFrameBase.set_ref_setting( # TODO:.. This part look weird
             self,
             reference_total_length=kwargs.get("reference_total_length", 1),
             n_elems=kwargs.get("n_elems", 100)
@@ -56,14 +67,29 @@ class MuscleFrameBase(FrameBase):
         self.ax_muscles_info = kwargs["ax_muscles_info"]
 
     def set_n_elems(self, n_elems):
+        """set_n_elems.
+
+        Parameters
+        ----------
+        n_elems :
+        """
         self.n_elems = n_elems
         self.s = np.linspace(0, 1, self.n_elems+1)
 
     def set_ref_setting(self, reference_total_length, n_elems):
+        """set_ref_setting.
+
+        Parameters
+        ----------
+        reference_total_length :
+        n_elems :
+        """
         self.reference_total_length = reference_total_length
         MuscleFrameBase.set_n_elems(self, n_elems)
 
-    def ax_muscles_reset(self,):
+    def ax_muscles_reset(self):
+        """ax_muscles_reset.
+        """
         ax = self.fig.add_subplot(
             self.gs[
                 self.ax_muscles_info['indices'][0],
@@ -78,6 +104,12 @@ class MuscleFrameBase(FrameBase):
         return self.ax_muscles
 
     def reset(self, axes_muscle_info=None):
+        """reset.
+
+        Parameters
+        ----------
+        axes_muscle_info :
+        """
         FrameBase.reset(self,)
         if axes_muscle_info is None:
             return self.ax_muscles_reset()
@@ -192,6 +224,14 @@ class MuscleFrameBase(FrameBase):
 
     @classmethod
     def plot_muscle_activation(cls, ax, s, activation, **kwargs):
+        """plot_muscle_activation.
+
+        Parameters
+        ----------
+        ax :
+        s :
+        activation :
+        """
         alpha = kwargs.get("alpha", 1)
         if kwargs.get('fill', True):
             ax.fill_between(
@@ -225,7 +265,18 @@ class MuscleFrameBase(FrameBase):
 
 
 class TransverseMuscleFrame(MuscleFrameBase):
+    """TransverseMuscleFrame.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
         MuscleFrameBase.__init__(
             self,
             file_dict=file_dict,
@@ -237,10 +288,23 @@ class TransverseMuscleFrame(MuscleFrameBase):
         self.axes_TM_info = kwargs["axes_TM_info"]
     
     def reset(self,):
+        """reset.
+        """
         self.axes_TM = MuscleFrameBase.reset(self, self.axes_TM_info)
 
 class LongitudinalMuscleFrame(MuscleFrameBase):
+    """LongitudinalMuscleFrame.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
         MuscleFrameBase.__init__(
             self,
             file_dict=file_dict,
@@ -252,9 +316,14 @@ class LongitudinalMuscleFrame(MuscleFrameBase):
         self.axes_LM_info = kwargs["axes_LM_info"]
     
     def reset(self,):
+        """reset.
+        """
         self.axes_LM = MuscleFrameBase.reset(self, self.axes_LM_info)
 
 class ObliqueMuscleFrame(MuscleFrameBase):
+    """ObliqueMuscleFrame.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):
         MuscleFrameBase.__init__(
             self,
@@ -267,4 +336,12 @@ class ObliqueMuscleFrame(MuscleFrameBase):
         self.axes_OM_info = kwargs["axes_OM_info"]
     
     def reset(self,):
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
         self.axes_OM = MuscleFrameBase.reset(self, self.axes_OM_info)

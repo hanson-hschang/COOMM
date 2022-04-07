@@ -1,6 +1,5 @@
-"""
-Created on Sep. 23, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Rod frame implementation
 """
 
 import numpy as np
@@ -16,11 +15,23 @@ from comm._rendering_tool import (
     process_position, process_director
 )
 
+# TODO: Maybe combine into class
 rod_color = base_colors['m']
 algo_rod_color = base_colors['g']
 
 class RodFrame(FrameBase):
+    """RodFrame.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
         FrameBase.__init__(
             self,
             file_dict=file_dict,
@@ -44,10 +55,18 @@ class RodFrame(FrameBase):
         RodFrame.set_n_elems(self, kwargs.get("n_elems", 100))
 
     def set_n_elems(self, n_elems):
+        """set_n_elems.
+
+        Parameters
+        ----------
+        n_elems :
+        """
         self.n_elems = n_elems
         self.s = np.linspace(0, 1, self.n_elems+1)
 
     def reset(self,):
+        """reset.
+        """
         FrameBase.reset(self,)
         
         if self.ax_main_3d_flag:
@@ -70,6 +89,12 @@ class RodFrame(FrameBase):
             RodFrame.plot_ref_configuration(self)
 
     def set_ref_configuration(self, position):
+        """set_ref_configuration.
+
+        Parameters
+        ----------
+        position :
+        """
         self.reference_configuration_flag = True
         self.reference_position = position.copy()
         
@@ -81,6 +106,8 @@ class RodFrame(FrameBase):
         return self.reference_total_length
 
     def plot_ref_configuration(self,):
+        """plot_ref_configuration.
+        """
         line_position = process_position(
             self.reference_position,
             self.offset, self.rotation
@@ -98,6 +125,14 @@ class RodFrame(FrameBase):
             )
 
     def calculate_line_position(self, position, director, radius):
+        """calculate_line_position.
+
+        Parameters
+        ----------
+        position :
+        director :
+        radius :
+        """
         line_center = process_position(
             position, self.offset, self.rotation
         ) / self.reference_total_length
@@ -125,6 +160,14 @@ class RodFrame(FrameBase):
         return line_center, [line_up, line_right, line_down, line_left]
 
     def plot_rod2d(self, position, director, radius, **kwargs):
+        """plot_rod2d.
+
+        Parameters
+        ----------
+        position :
+        director :
+        radius :
+        """
         color = kwargs.get("color", self.rod_color)
         alpha = kwargs.get("alpha", 1)
         line_center, lines = self.calculate_line_position(
@@ -172,6 +215,14 @@ class RodFrame(FrameBase):
         return self.ax_main
 
     def plot_rod3d(self, position, director, radius, **kwargs):
+        """plot_rod3d.
+
+        Parameters
+        ----------
+        position :
+        director :
+        radius :
+        """
         color = kwargs.get("color", self.rod_color)
         alpha = kwargs.get("alpha", 1)
         line_center, lines = self.calculate_line_position(
@@ -208,10 +259,18 @@ class RodFrame(FrameBase):
 
     def set_ax_main_lim(
         self, 
-        x_lim=[-1.1, 1.1],
+        x_lim=[-1.1, 1.1], # FIXME
         y_lim=[-1.1, 1.1],
         z_lim=[-1.1, 1.1]
     ):
+        """set_ax_main_lim.
+
+        Parameters
+        ----------
+        x_lim :
+        y_lim :
+        z_lim :
+        """
         self.ax_main.set_xlim(x_lim)
         self.ax_main.set_ylim(y_lim)
         if self.ax_main_3d_flag:
@@ -219,6 +278,12 @@ class RodFrame(FrameBase):
 
     def set_labels(self, time=None):
         if time is not None:
+        """set_labels.
+
+        Parameters
+        ----------
+        time :
+        """
             self.ax_main.set_title(
                 "time={:.2f} [sec]".format(time), 
                 fontsize=self.fontsize
@@ -227,7 +292,18 @@ class RodFrame(FrameBase):
         # self.ax_main.legend()
 
 class StrainFrame(FrameBase):
+    """StrainFrame.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
         FrameBase.__init__(
             self,
             file_dict=file_dict,
@@ -246,12 +322,20 @@ class StrainFrame(FrameBase):
         StrainFrame.set_n_elems(self, kwargs.get("n_elems", 100))
 
     def set_n_elems(self, n_elems):
+        """set_n_elems.
+
+        Parameters
+        ----------
+        n_elems :
+        """
         self.n_elems = n_elems
         s = np.linspace(0, 1, self.n_elems+1)
         self.s_shear = (s[:-1] + s[1:])/2
         self.s_kappa = s[1:-1].copy()
 
     def reset(self,):
+        """reset.
+        """
         FrameBase.reset(self,)
         
         self.axes_kappa = []
@@ -281,6 +365,13 @@ class StrainFrame(FrameBase):
             StrainFrame.plot_ref_configuration(self,)
 
     def set_ref_configuration(self, shear, kappa):
+        """set_ref_configuration.
+
+        Parameters
+        ----------
+        shear :
+        kappa :
+        """
         self.reference_configuration_flag = True
         self.reference_shear = shear.copy()
         self.reference_kappa = kappa.copy()
@@ -288,6 +379,8 @@ class StrainFrame(FrameBase):
         return 
 
     def plot_ref_configuration(self,):
+        """plot_ref_configuration.
+        """
         for index_i in range(3):
             self.axes_shear[index_i].plot(
                 self.s_shear,
@@ -303,6 +396,14 @@ class StrainFrame(FrameBase):
             )
 
     def plot_strain(self, shear, kappa, color=None):
+        """plot_strain.
+
+        Parameters
+        ----------
+        shear :
+        kappa :
+        color :
+        """
         for index_i in range(3):
             self.axes_shear[index_i].plot(
                 self.s_shear,
@@ -318,7 +419,7 @@ class StrainFrame(FrameBase):
 
     def set_axes_strain_lim(
         self, 
-        axes_shear_lim = [
+        axes_shear_lim = [ # FIXME
             [-0.11, 0.11],
             [-0.11, 0.11],
             [-0.1, 2.1]
@@ -329,6 +430,13 @@ class StrainFrame(FrameBase):
             [-110, 110],
         ]
     ):
+        """set_axes_strain_lim.
+
+        Parameters
+        ----------
+        axes_shear_lim :
+        axes_kappa_lim :
+        """
         for index_i in range(3):
             shear_mean = np.average(axes_shear_lim[index_i]) if index_i != 2 else 1
             shear_log = np.floor(
@@ -351,6 +459,8 @@ class StrainFrame(FrameBase):
             )
 
     def set_labels(self,):
+        """set_labels.
+        """
         for index_i in range(3):
             self.axes_shear[index_i].set_ylabel(
                 "d$_{}$".format(index_i+1),

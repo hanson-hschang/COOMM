@@ -1,6 +1,5 @@
-"""
-Created on Mar. 8, 2022
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Cylinder object implementation
 """
 
 import numpy as np
@@ -9,7 +8,27 @@ from comm.objects.object import Object
 from comm.objects.target import Target
 
 class Cylinder(Object):
+    """Cylinder.
+    """
+
     def __init__(self, position, director, radius, length, n_elements, cost_weight):
+        """__init__.
+
+        Parameters
+        ----------
+        position :
+            position
+        director :
+            director
+        radius :
+            radius
+        length :
+            length
+        n_elements :
+            n_elements
+        cost_weight :
+            cost_weight
+        """
         Object.__init__(self, n_elements, cost_weight)
         self.position = position.copy()
         self.director = director.copy()
@@ -17,17 +36,49 @@ class Cylinder(Object):
         self.length = length
 
     def update_pose_from_sphere(self, sphere):
+        """update_pose_from_sphere.
+
+        Parameters
+        ----------
+        sphere :
+            sphere
+        """
         self.update_position(sphere.position_collection[:, 0])
         self.update_director(sphere.director_collection[:, :, 0])
 
     def update_position(self, position):
+        """update_position.
+
+        Parameters
+        ----------
+        position :
+            position
+        """
         self.position = position.copy()
 
     def update_director(self, director):
+        """update_director.
+
+        Parameters
+        ----------
+        director :
+            director
+        """
         self.director = director.copy()
 
     @classmethod
     def get_cylinder(cls, cylinder, n_elements, cost_weight):
+        """get_cylinder.
+
+        Parameters
+        ----------
+        cylinder :
+            cylinder
+        n_elements :
+            n_elements
+        cost_weight :
+            cost_weight
+        """
         return Cylinder(
             cylinder.position_collection[:, 0].copy(),
             cylinder.director_collection[:, :, 0].copy(),
@@ -35,6 +86,8 @@ class Cylinder(Object):
         )
 
     def calculate_continuous_cost_gradient_wrt_position(self, **kwargs):
+        """calculate_continuous_cost_gradient_wrt_position.
+        """
         position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
         radius = kwargs['radius']
         position_diff = position-self.position[:, None]
@@ -46,22 +99,56 @@ class Cylinder(Object):
         )
 
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
+        """calculate_continuous_cost_gradient_wrt_director.
+        """
         pass
     
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
+        """calculate_discrete_cost_gradient_wrt_position.
+        """
         pass
     
     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
+        """calculate_discrete_cost_gradient_wrt_director.
+        """
         pass
 
 class CylinderTarget(Cylinder, Target):
+    """CylinderTarget.
+    """
+
     def __init__(self, position, director, radius, length, n_elements, cost_weight, target_cost_weight, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        position :
+        director :
+        radius :
+        length :
+        n_elements :
+        cost_weight :
+        target_cost_weight :
+        """
         Cylinder.__init__(self, position, director, radius, length, n_elements, cost_weight)
         Target.__init__(self, target_cost_weight)
         self.director_cost_flag = kwargs.get('director_cost_flag', False)
 
     @classmethod
     def get_cylinder(cls, cylinder, n_elements, cost_weight, target_cost_weight, **kwargs):
+        """get_cylinder.
+
+        Parameters
+        ----------
+        cylinder :
+            cylinder
+        n_elements :
+            n_elements
+        cost_weight :
+            cost_weight
+        target_cost_weight :
+            target_cost_weight
+        """
         return CylinderTarget(
             cylinder.position_collection[:, 0].copy(),
             cylinder.director_collection[:, :, 0].copy(),
@@ -71,6 +158,8 @@ class CylinderTarget(Cylinder, Target):
         )
     
     def calculate_continuous_cost_gradient_wrt_position(self, **kwargs):
+        """calculate_continuous_cost_gradient_wrt_position.
+        """
         Cylinder.calculate_continuous_cost_gradient_wrt_position(self, **kwargs)
         position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
         radius = kwargs['radius']
@@ -84,6 +173,8 @@ class CylinderTarget(Cylinder, Target):
         )
     
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
+        """calculate_continuous_cost_gradient_wrt_director.
+        """
         director = kwargs['director'][:, :, :]
         n_elems = director.shape[2]
         vector = np.zeros((3, n_elems))
@@ -97,6 +188,8 @@ class CylinderTarget(Cylinder, Target):
             )
     
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
+        """calculate_discrete_cost_gradient_wrt_position.
+        """
         # position = 0.5*(kwargs['position'][:, -1]+kwargs['position'][:, -2])
         # self.cost_gradient.discrete.wrt_position[:, -1] = (
         #     self.target_cost_weight['position'] * (position-self.position)
@@ -104,6 +197,8 @@ class CylinderTarget(Cylinder, Target):
         pass
     
     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
+        """calculate_discrete_cost_gradient_wrt_director.
+        """
         # director = kwargs['director'][:, :, -1]
         # vector = np.zeros(3)
         # skew_symmetric_matrix = director @ self.director.T - self.director @ director.T

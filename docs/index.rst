@@ -10,7 +10,17 @@ Welcome to COMM's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   guide/tutorials
 
+.. toctree::
+   :maxdepth: 2
+   :caption: API:
+
+   api/actuation
+   api/algorithms
+   api/forces
+   api/objects
+   api/frames
 
 Indices and tables
 ==================

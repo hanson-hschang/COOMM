@@ -1,6 +1,5 @@
-"""
-Created on Nov. 16, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Target Implementation
 """
 
 import numpy as np

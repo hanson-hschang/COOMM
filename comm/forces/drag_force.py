@@ -1,6 +1,5 @@
-"""
-Created on Sep. 23, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Force module
 """
 
 import numpy as np
@@ -15,10 +14,24 @@ from comm._rod_tool import _lab_to_material, _material_to_lab, average2D
 
 
 class DragForce(NoForces):
+    """DragForce.
+    """
+
     def __init__(self, rho_environment,
         c_per, c_tan, system,
         step_skip: int, callback_params: dict
     ):
+        """__init__.
+
+        Parameters
+        ----------
+        rho_environment :
+        c_per :
+        c_tan :
+        system :
+        step_skip : int
+        callback_params : dict
+        """
 
         self.rho_environment = rho_environment
         self.c_per = c_per
@@ -36,6 +49,13 @@ class DragForce(NoForces):
         self.callback_params = callback_params
     
     def apply_torques(self, system, time: np.float = 0.0):
+        """apply_torques.
+
+        Parameters
+        ----------
+        system :
+        time : np.float
+        """
         Pa = 2 * system.radius * system.lengths
         Sa = Pa * np.pi
         self.calculate_drag_force(
@@ -47,12 +67,16 @@ class DragForce(NoForces):
         inplace_addition(system.external_forces, self.drag_force)
         self.callback()
 
-    def callback(self,):
+    def callback(self):
+        """callback.
+        """
         if self.step % self.every == 0:
             self.callback_func()
         self.step += 1
 
     def callback_func(self):
+        """callback_func.
+        """
         self.callback_params['velocity_material_frame'].append(
             self.velocity_material_frame.copy()
         )
