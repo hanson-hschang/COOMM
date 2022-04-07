@@ -1,6 +1,5 @@
-"""
-Created on Nov. 14, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Rigid-body frame implementation
 """
 
 import numpy as np
@@ -17,10 +16,22 @@ from comm._rendering_tool import (
     process_position, process_director
 )
 
+# TODO: Combine into class maybe
 rigidbody_color = base_colors['y']
 
 class RigidbodyFrame(FrameBase):
+    """RigidbodyFrame.
+    """
+
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):
+        """__init__.
+
+        Parameters
+        ----------
+        file_dict :
+        fig_dict :
+        gs_dict :
+        """
         FrameBase.__init__(
             self,
             file_dict=file_dict,
@@ -44,9 +55,17 @@ class RigidbodyFrame(FrameBase):
         RigidbodyFrame.set_n_elems(self, kwargs.get("n_elems", 1))
 
     def set_n_elems(self, n_elems):
+        """set_n_elems.
+
+        Parameters
+        ----------
+        n_elems :
+        """
         self.n_elems = n_elems
 
     def reset(self,):
+        """reset.
+        """
         FrameBase.reset(self,)
         
         if self.ax_main_3d_flag:
@@ -66,23 +85,55 @@ class RigidbodyFrame(FrameBase):
             )
 
     def plot_rigidybody2d(self, position, director, radius, color=None):
+        """plot_rigidybody2d.
+
+        Parameters
+        ----------
+        position :
+        director :
+        radius :
+        color :
+        """
         return self.ax_main
 
     def plot_rigidybody3d(self, position, director, radius, color=None):
+        """plot_rigidybody3d.
+
+        Parameters
+        ----------
+        position :
+        director :
+        radius :
+        color :
+        """
         return self.ax_main
 
     def set_ax_main_lim(
         self, 
-        x_lim=[-1.1, 1.1],
+        x_lim=[-1.1, 1.1], # FIXME: Never use mutable object for default
         y_lim=[-1.1, 1.1],
         z_lim=[-1.1, 1.1]
     ):
+        """set_ax_main_lim.
+
+        Parameters
+        ----------
+        x_lim :
+        y_lim :
+        z_lim :
+        """
         self.ax_main.set_xlim(x_lim)
         self.ax_main.set_ylim(y_lim)
         if self.ax_main_3d_flag:
             self.ax_main.set_zlim(z_lim)
 
     def set_labels(self, time=None):
+        """set_labels.
+
+        Parameters
+        ----------
+        time :
+        """
         if time is not None:
             self.ax_main.set_title(
                 "time={:.2f} [sec]".format(time), 

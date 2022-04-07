@@ -1,10 +1,10 @@
-"""
-Created on Sep. 23, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Frame tool implementations
 """
 import numpy as np
 import matplotlib.colors as mcolors
 
+# TODO: maybe combine default plotting parameters?
 default_colors = mcolors.TABLEAU_COLORS
 # default_colors['tab:blue']    # muted blue
 # default_colors['tab:orange']  # safety orange
@@ -59,9 +59,23 @@ paper_linewidth = 5
 def change_box_to_arrow_axes(
     fig, ax, linewidth=1.0, overhang=0.0,
     xaxis_ypos=0, yaxis_xpos=0,
-    x_offset=[0, 0], y_offset=[0, 0],
+    x_offset=[0, 0], y_offset=[0, 0], # TODO: Never use mutable (list) object for default
     color='black'
 ):
+    """change_box_to_arrow_axes.
+
+    Parameters
+    ----------
+    fig :
+    ax :
+    linewidth :
+    overhang :
+    xaxis_ypos :
+    yaxis_xpos :
+    x_offset :
+    y_offset :
+    color :
+    """
     for spine in ax.spines.values():
         spine.set_visible(False)
 
@@ -100,9 +114,21 @@ def change_box_to_arrow_axes(
 
 def change_box_to_only_y_arrow_ax(
     fig, ax, linewidth=1.0, overhang=0.0,
-    yaxis_xpos=0, y_offset=[0, 0],
+    yaxis_xpos=0, y_offset=[0, 0], # TODO: Never use mutable (list) object for default
     color='black'
 ):
+    """change_box_to_only_y_arrow_ax.
+
+    Parameters
+    ----------
+    fig :
+    ax :
+    linewidth :
+    overhang :
+    yaxis_xpos :
+    y_offset :
+    color :
+    """
     for spine in ax.spines.values():
         spine.set_visible(False)
 
@@ -135,9 +161,20 @@ def change_box_to_only_y_arrow_ax(
 
 def change_box_to_only_x_line_ax(
     fig, ax, linewidth=1.0,
-    xaxis_ypos=0, x_offset=[0, 0],
+    xaxis_ypos=0, x_offset=[0, 0], # TODO: Never use mutable (list) object for default
     color='black'
 ):
+    """change_box_to_only_x_line_ax.
+
+    Parameters
+    ----------
+    fig :
+    ax :
+    linewidth :
+    xaxis_ypos :
+    x_offset :
+    color :
+    """
     for spine in ax.spines.values():
         spine.set_visible(False)
 
@@ -155,6 +192,17 @@ def change_box_to_only_x_line_ax(
     return ax
 
 def add_y_ticks(ax, yticks, ticks_xpos, length, linewidth, color='black'):
+    """add_y_ticks.
+
+    Parameters
+    ----------
+    ax :
+    yticks :
+    ticks_xpos :
+    length :
+    linewidth :
+    color :
+    """
     ax.set_yticks(yticks)
     for ytick in yticks:
         ax.plot(
