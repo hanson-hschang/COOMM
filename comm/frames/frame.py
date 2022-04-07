@@ -9,7 +9,7 @@ from matplotlib import gridspec
 
 from comm._rendering_tool import check_folder
 
-class FrameBase(object):
+class FrameBase:
     def __init__(self, file_dict, fig_dict, gs_dict):
         self.figure_name = file_dict["figure_name"]
         self.folder_name = file_dict.get("folder_name", None)

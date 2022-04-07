@@ -31,7 +31,7 @@ class ForwardBackward(Algorithm):
         print("Finishing the algorithm at maximum iternation", self.iteration)
         return
 
-class Costate(object):
+class Costate:
     def __init__(self, n_elements):
         # material frame
         self.internal_force = np.zeros((3, n_elements))

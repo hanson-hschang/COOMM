@@ -1,13 +1,10 @@
-"""
-Created on Sep. 23, 2021
-@author: Heng-Sheng (Hanson) Chang
+__doc__ = """
+Common callback function used in COMM.
 """
 
 from collections import defaultdict
-import sys
 
 from elastica.wrappers import callbacks
-sys.path.append("../../")   # include elastica-python directory
 
 from elastica.callback_functions import CallBackBaseClass
 
