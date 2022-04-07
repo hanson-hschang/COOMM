@@ -2,8 +2,6 @@ __doc__ = """
 Collection of rod data-processing kernels.
 """
 
-import sys
-
 import numpy as np
 from numba import njit
 

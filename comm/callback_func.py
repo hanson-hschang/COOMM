@@ -3,7 +3,6 @@ Common callback function used in COMM.
 """
 
 from collections import defaultdict
-import sys
 
 from elastica.wrappers import callbacks
 
