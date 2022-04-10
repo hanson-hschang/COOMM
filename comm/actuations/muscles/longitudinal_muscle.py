@@ -13,10 +13,10 @@ class LongitudinalMuscle(MuscleForce):
 
     def __init__(
         self,
-        muscle_init_angle,
+        muscle_init_angle: float,
         ratio_muscle_position,
         rest_muscle_area,
-        max_muscle_stress,
+        max_muscle_stress: float,
         **kwargs
     ):
         """
@@ -24,22 +24,20 @@ class LongitudinalMuscle(MuscleForce):
 
         Parameters
         ----------
-        muscle_init_angle :
+        muscle_init_angle : float
         ratio_muscle_position :
         rest_muscle_area :
-        max_muscle_stress :
+        max_muscle_stress : float
         """
         n_elem = rest_muscle_area.shape[0]
-        kwargs.setdefault("type_name", "LM")
-        MuscleForce.__init__(
-            self,
-            ratio_muscle_position * (
-                [[np.cos(muscle_init_angle)], 
-                 [np.sin(muscle_init_angle)],
-                 [0]] * 
-                np.ones((3, n_elem))
-            ),
+        ratio_muscle_position = ratio_muscle_position * \
+            np.array([np.cos(muscle_init_angle), np.sin(muscle_init_angle), 0])
+        ratio_muscle_position = np.repeat(ratio_muscle_position[:,None], n_elem, axis=1)
+        max_muscle_stress = max_muscle_stress * np.ones(n_elem),
+        super().__init__(
+            ratio_muscle_position,
             rest_muscle_area,
-            max_muscle_stress * np.ones(n_elem),
+            max_muscle_stress,
+            type_name="LM",
             **kwargs
         )

@@ -192,7 +192,7 @@ class MuscleForce(Muscle):
         """
         kwargs.setdefault("muscle_type", "muscle_force")
         Muscle.__init__(
-            self, ratio_muscle_position, rest_muscle_area, **kwargs
+            self, ratio_muscle_position, rest_muscle_area, muscle_type="muscle_force", **kwargs
         )
         self.activation = np.zeros(self.n_elements)
         self.s_activation = (self.s[:-1]+self.s[1:])/2

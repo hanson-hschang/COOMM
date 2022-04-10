@@ -25,12 +25,11 @@ class TransverseMuscle(MuscleForce):
         max_muscle_stress :
         """
         n_elem = rest_muscle_area.shape[0]
-        kwargs.setdefault("type_name", "TM")
-        MuscleForce.__init__(
-            self,
-            [[0], [0], [0]] * np.ones((3, n_elem)),
-            rest_muscle_area,
-            -max_muscle_stress * np.ones(n_elem),
+        super().__init__(
+            ratio_muscle_position=np.zeros((3, n_elem)),
+            rest_muscle_area=rest_muscle_area,
+            max_muscle_stress=-max_muscle_stress * np.ones(n_elem),
+            type_name="TM",
             **kwargs
         )
 
