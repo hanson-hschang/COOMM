@@ -106,7 +106,7 @@ class Muscle(ContinuousActuation, MuscleInfo):
         self.calculate_muscle_length(
             self.muscle_length, self.muscle_strain
         )
-        self.muscle_rest_length[:] = self.muscle_length.copy()
+        self.muscle_rest_length[:] = self.muscle_length
 
     @staticmethod
     @njit(cache=True)
@@ -261,7 +261,7 @@ class MuscleForce(Muscle):
         )
 
     def apply_activation(self, activation):
-        self.set_activation(self.activation, activation.copy())
+        self.set_activation(self.activation, activation)
 
     @staticmethod
     @njit(cache=True)
@@ -327,9 +327,9 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
         ----------
         activation :
         """
-        self.set_activation(self.activation, activation.copy())
+        self.set_activation(self.activation, activation)
         for muscle in self.muscles:
-            muscle.set_activation(muscle.activation, self.activation.copy())
+            muscle.set_activation(muscle.activation, self.activation)
 
     @staticmethod
     @njit(cache=True)
