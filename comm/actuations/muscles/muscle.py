@@ -94,9 +94,13 @@ class Muscle(ContinuousActuation, MuscleInfo):
         type_name : str
         index : int
         """
-        self.n_elements = rest_muscle_area.shape[0]
+        super().__init__(
+            n_elements=rest_muscle_area.shape[0],
+            type_name=type_name,
+            index=index,
+            **kwargs
+        )
         self.s = np.linspace(0, 1, self.n_elements + 1)
-        ContinuousActuation.__init__(self, self.n_elements)
         self.muscle_normalized_length = np.zeros(self.n_elements)
         self.muscle_rest_length = np.ones(self.n_elements)
         self.muscle_length = np.zeros(self.n_elements)
@@ -106,7 +110,6 @@ class Muscle(ContinuousActuation, MuscleInfo):
         self.ratio_muscle_position = ratio_muscle_position.copy()
         self.rest_muscle_area = rest_muscle_area.copy()
         self.muscle_area = self.rest_muscle_area.copy()
-        MuscleInfo.__init__(self, type_name=type_name, index=index)
 
     def __call__(self, system: elastica.rod.RodBase) -> None:
         """__call__.
@@ -352,19 +355,19 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
     Group of muscle. Provides convinience tools to operate group-activation.
     """
 
-    def __init__(self, muscles: Iterable[Muscle], **kwargs):
+    def __init__(self, muscles: Iterable[Muscle], type_name:str="muscle_group", index:int=0, **kwargs):
         """__init__.
 
         Parameters
         ----------
         muscles : Iterable[Muscle]
         """
-        ContinuousActuation.__init__(self, muscles[0].n_elements)
-        MuscleInfo.__init__(
-            self,
-            type_name=kwargs.get("type_name", "muscle_group"),
-            index=kwargs.get("index", 0),
+        super().__init__(
+            n_elements=muscles[0].n_elements,
+            type_name=type_name,
+            index=index
         )
+
         self.muscles = muscles
         for m, muscle in enumerate(self.muscles):
             muscle.index = m
