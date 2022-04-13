@@ -2,7 +2,7 @@ __doc__ = """
 Muscle base class implementation.
 """
 
-from typing import Union, Iterable
+from typing import Union, Iterable, Dict
 
 from collections import defaultdict
 import numpy as np
@@ -243,7 +243,13 @@ class MuscleForce(Muscle):
         self.s_force = 0.5 * (self.s[:-1] + self.s[1:])
         self.force_length_weight = kwargs.get("force_length_weight", np.ones_like)
 
-    def __call__(self, system):
+    def __call__(self, system: elastica.rod.RodBase):
+        """__call__.
+
+        Parameters
+        ----------
+        system : elastica.rod.RodBase
+        """
         super().__call__(system)
         self.calculate_muscle_length(self.muscle_length, self.muscle_strain)
         self.calculate_muscle_normalized_length(
@@ -314,7 +320,15 @@ class MuscleForce(Muscle):
             external_couple,
         )
 
-    def apply_activation(self, activation):
+    def apply_activation(self, activation: Union[float, np.ndarray]):
+        """apply_activation.
+
+        Parameters
+        ----------
+        activation : Union[float, np.ndarray]
+            If array of activation is given, the shape of activation is expected to
+            match the shape of muscle_activation.
+        """
         self.set_activation(self.activation, activation)
 
     @staticmethod
@@ -322,12 +336,21 @@ class MuscleForce(Muscle):
     def set_activation(muscle_activation, activation):
         muscle_activation[:] = activation
 
-    def get_activation(self):
+    def get_activation(self) -> Union[float, np.ndarray]:
+        """
+        activation getter
+
+        Returns
+        -------
+        activation: Union[float, np.ndarray]
+        """
         return self.activation
 
 
 class MuscleGroup(ContinuousActuation, MuscleInfo):
-    """MuscleGroup."""
+    """MuscleGroup.
+    Group of muscle. Provides convinience tools to operate group-activation.
+    """
 
     def __init__(self, muscles: Iterable[Muscle], **kwargs):
         """__init__.
@@ -376,6 +399,8 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
     def apply_activation(self, activation: Union[float, np.ndarray]):
         """apply_activation.
 
+        MuscleGroup apply activation
+
         Parameters
         ----------
         activation : Union[float, np.ndarray]
@@ -391,9 +416,13 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
     def set_activation(muscle_activation, activation):
         muscle_activation[:] = activation
 
-    def get_activation(self):
+    def get_activation(self) -> Union[float, np.ndarray]:
         """
         activation getter
+
+        Returns
+        -------
+        activation: Union[float, np.ndarray]
         """
         return self.activation
 
@@ -412,17 +441,17 @@ class ApplyMuscles(ApplyActuations):
         step_skip : int
         callback_params_list : list
         """
-        ApplyActuations.__init__(self, muscles, step_skip, callback_params_list)
+        super().__init__(muscles, step_skip, callback_params_list)
         for m, muscle in enumerate(muscles):
             muscle.index = m
 
-    def callback_func(self, muscles, callback_params_list):
+    def callback_func(self, muscles: Iterable[Muscle], callback_params_list: Iterable[Dict]):
         """callback_func.
 
         Parameters
         ----------
-        muscles :
-        callback_params_list :
+        muscles : Iterable[Muscle]
+        callback_params_list : Iterable[Dict]
         """
         for muscle, callback_params in zip(muscles, callback_params_list):
             callback_params["muscle_info"].append(str(muscle))
@@ -456,7 +485,7 @@ class ApplyMuscleGroups(ApplyMuscles):
         step_skip : int
         callback_params_list : list
         """
-        super.__init__(muscle_groups, step_skip, callback_params_list)
+        super().__init__(muscle_groups, step_skip, callback_params_list)
         for muscle_group, callback_params in zip(
             muscle_groups, self.callback_params_list
         ):
