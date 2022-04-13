@@ -16,9 +16,9 @@ class LongitudinalMuscle(MuscleForce):
     def __init__(
         self,
         muscle_init_angle: float,
-        ratio_muscle_position,
-        rest_muscle_area,
-        max_muscle_stress: float,
+        ratio_muscle_position: np.ndarray,
+        rest_muscle_area: np.ndarray,
+        max_muscle_stress: Union[float, np.ndarray],
         **kwargs
     ):
         """
@@ -27,20 +27,23 @@ class LongitudinalMuscle(MuscleForce):
         Parameters
         ----------
         muscle_init_angle : float
-        ratio_muscle_position :
-        rest_muscle_area :
-        max_muscle_stress : float
+        ratio_muscle_position : np.ndarray
+            shape: (3, n_element)
+        rest_muscle_area : np.ndarray
+            shape: (n_element)
+        max_muscle_stress : Union[float, np.ndarray]
+            shape: (n_element)
         """
-        n_elem = rest_muscle_area.shape[0]
+
+        # FIXME: I'm not sure keeping ratio_muscle_position name after the operation is good idea.
         ratio_muscle_position = (
             ratio_muscle_position
             * np.array([[np.cos(muscle_init_angle)], [np.sin(muscle_init_angle)], [0]])
         )
-        max_muscle_stress = max_muscle_stress * np.ones(n_elem)
         super().__init__(
-            ratio_muscle_position,
-            rest_muscle_area,
-            max_muscle_stress,
+            ratio_muscle_position=ratio_muscle_position,
+            rest_muscle_area=rest_muscle_area,
+            max_muscle_stress=max_muscle_stress,
             type_name="LM",
             **kwargs
         )
