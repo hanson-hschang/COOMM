@@ -98,7 +98,7 @@ class Muscle(ContinuousActuation, MuscleInfo):
             n_elements=rest_muscle_area.shape[0],
             type_name=type_name,
             index=index,
-            **kwargs
+            **kwargs,
         )
         self.s = np.linspace(0, 1, self.n_elements + 1)
         self.muscle_normalized_length = np.zeros(self.n_elements)
@@ -355,7 +355,13 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
     Group of muscle. Provides convinience tools to operate group-activation.
     """
 
-    def __init__(self, muscles: Iterable[Muscle], type_name:str="muscle_group", index:int=0, **kwargs):
+    def __init__(
+        self,
+        muscles: Iterable[Muscle],
+        type_name: str = "muscle_group",
+        index: int = 0,
+        **kwargs,
+    ):
         """__init__.
 
         Parameters
@@ -363,9 +369,7 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
         muscles : Iterable[Muscle]
         """
         super().__init__(
-            n_elements=muscles[0].n_elements,
-            type_name=type_name,
-            index=index
+            n_elements=muscles[0].n_elements, type_name=type_name, index=index
         )
 
         self.muscles = muscles
@@ -448,7 +452,9 @@ class ApplyMuscles(ApplyActuations):
         for m, muscle in enumerate(muscles):
             muscle.index = m
 
-    def callback_func(self, muscles: Iterable[Muscle], callback_params_list: Iterable[Dict]):
+    def callback_func(
+        self, muscles: Iterable[Muscle], callback_params_list: Iterable[Dict]
+    ):
         """callback_func.
 
         Parameters
