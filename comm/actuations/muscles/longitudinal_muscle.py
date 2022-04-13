@@ -34,10 +34,7 @@ class LongitudinalMuscle(MuscleForce):
         n_elem = rest_muscle_area.shape[0]
         ratio_muscle_position = (
             ratio_muscle_position
-            * np.array([[np.cos(muscle_init_angle), np.sin(muscle_init_angle), 0]]).T
-        )
-        ratio_muscle_position = np.repeat(
-            ratio_muscle_position[:, None], n_elem, axis=1
+            * np.array([[np.cos(muscle_init_angle)], [np.sin(muscle_init_angle)], [0]])
         )
         max_muscle_stress = max_muscle_stress * np.ones(n_elem)
         super().__init__(
