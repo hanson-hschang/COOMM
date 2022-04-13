@@ -2,12 +2,13 @@ __doc__ = """
 Muscle base class implementation.
 """
 
-from typing import Union
+from typing import Union, Iterable
 
 from collections import defaultdict
 import numpy as np
 from numba import njit
 
+import elastica
 from elastica._linalg import _batch_cross
 from elastica._calculus import quadrature_kernel
 from elastica.external_forces import inplace_addition
@@ -22,12 +23,9 @@ from comm.actuations.actuation import (
 
 
 @njit(cache=True)
-def unit_weight(input):
-    return np.ones(input.shape)
-
-
-@njit(cache=True)
-def force_length_weight_guassian(muscle_length, sigma=0.25):
+def force_length_weight_guassian(
+    muscle_length: np.ndarray, sigma: float = 0.25
+) -> npndarray:
     force_weight = np.exp(-0.5 * ((muscle_length - 1) / sigma) ** 2)
     return force_weight
 
@@ -35,8 +33,9 @@ def force_length_weight_guassian(muscle_length, sigma=0.25):
 # force-length curve (x) = 3.06 x^3 - 13.64 x^2 + 18.01 x - 6.44
 @njit(cache=True)
 def force_length_weight_poly(
-    muscle_length, f_l_coefficients=np.array([-6.44, 18.01, -13.64, 3.06])
-):
+    muscle_length: np.ndarray,
+    f_l_coefficients: np.ndarray = np.array([-6.44, 18.01, -13.64, 3.06]),
+) -> np.ndarray:  # FIXME: This work?? with numba??? In any way, parameters should be immutable
     degree = f_l_coefficients.shape[0]
 
     blocksize = muscle_length.shape[0]
@@ -51,14 +50,26 @@ def force_length_weight_poly(
 
 
 class MuscleInfo:
-    def __init__(self, type_name, index, **kwargs):
+    # TODO: Maybe try to implement this class as @dataclass
+    """MuscleInfo.
+    Data class to store muscle's meta data
+    """
+
+    def __init__(self, type_name: str, index: int, **kwargs) -> None:
+        """Muscle information constructor
+
+        Parameters
+        ----------
+        type_name : str
+            Name of the muscle type
+        index : int
+            Muscle index
+        """
         self.type_name = type_name
         self.index = index
 
-    def __str__(
-        self,
-    ):
-        return "{}_".format(self.index) + self.type_name
+    def __str__(self) -> str:
+        return f"{self.index}_{self.type_name}"
 
 
 class Muscle(ContinuousActuation, MuscleInfo):
@@ -66,18 +77,22 @@ class Muscle(ContinuousActuation, MuscleInfo):
 
     def __init__(
         self,
-        ratio_muscle_position,
-        rest_muscle_area,
+        ratio_muscle_position: np.ndarray,
+        rest_muscle_area: np.ndarray,
         type_name: str = "muscle",
         index: int = 0,
         **kwargs,
-    ):
+    ) -> None:
         """__init__.
 
         Parameters
         ----------
-        ratio_muscle_position :
-        rest_muscle_area :
+        ratio_muscle_position : np.ndarray
+            shape: (3, n_element)
+        rest_muscle_area : np.ndarray
+            shape: (n_element)
+        type_name : str
+        index : int
         """
         self.n_elements = rest_muscle_area.shape[0]
         self.s = np.linspace(0, 1, self.n_elements + 1)
@@ -93,7 +108,13 @@ class Muscle(ContinuousActuation, MuscleInfo):
         self.muscle_area = self.rest_muscle_area.copy()
         MuscleInfo.__init__(self, type_name=type_name, index=index)
 
-    def __call__(self, system):
+    def __call__(self, system: elastica.rod.RodBase) -> None:
+        """__call__.
+
+        Parameters
+        ----------
+        system : elastica.rod.RodBase
+        """
         self.calculate_muscle_area(
             self.rest_muscle_area, self.muscle_area, system.dilatation
         )
@@ -110,14 +131,14 @@ class Muscle(ContinuousActuation, MuscleInfo):
         )
         self.calculate_muscle_tangent(self.muscle_tangent, self.muscle_strain)
 
-    def set_current_length_as_rest_length(self, system):
+    def set_current_length_as_rest_length(self, system: elastica.rod.RodBase) -> None:
         """set_current_length_as_rest_length.
 
         Parameters
         ----------
-        system :
+        system : elastica.rod.RodBase
         """
-        Muscle.__call__(self, system)
+        self.__call__(system)
         self.calculate_muscle_length(self.muscle_length, self.muscle_strain)
         self.muscle_rest_length[:] = self.muscle_length
 
@@ -220,7 +241,7 @@ class MuscleForce(Muscle):
             )
         self.muscle_force = np.zeros(self.n_elements)
         self.s_force = 0.5 * (self.s[:-1] + self.s[1:])
-        self.force_length_weight = kwargs.get("force_length_weight", unit_weight)
+        self.force_length_weight = kwargs.get("force_length_weight", np.ones_like)
 
     def __call__(self, system):
         super().__call__(system)
@@ -308,12 +329,12 @@ class MuscleForce(Muscle):
 class MuscleGroup(ContinuousActuation, MuscleInfo):
     """MuscleGroup."""
 
-    def __init__(self, muscles, **kwargs):
+    def __init__(self, muscles: Iterable[Muscle], **kwargs):
         """__init__.
 
         Parameters
         ----------
-        muscles :
+        muscles : Iterable[Muscle]
         """
         ContinuousActuation.__init__(self, muscles[0].n_elements)
         MuscleInfo.__init__(
@@ -327,7 +348,13 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
         self.activation = np.zeros(self.muscles[0].activation.shape)
         self.s_activation = self.muscles[0].s_activation.copy()
 
-    def __call__(self, system):
+    def __call__(self, system: elastica.rod.RodBase):
+        """__call__.
+
+        Parameters
+        ----------
+        system : elastica.rod.RodBase
+        """
         self.reset_actuation()
         for muscle in self.muscles:
             muscle(system)
@@ -336,22 +363,24 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
             inplace_addition(self.internal_couple, muscle.internal_couple)
             inplace_addition(self.external_couple, muscle.external_couple)
 
-    def set_current_length_as_rest_length(self, system):
+    def set_current_length_as_rest_length(self, system: elastica.rod.RodBase):
         """set_current_length_as_rest_length.
 
         Parameters
         ----------
-        system :
+        system : elastica.rod.RodBase
         """
         for muscle in self.muscles:
             muscle.set_current_length_as_rest_length(system)
 
-    def apply_activation(self, activation):
+    def apply_activation(self, activation: Union[float, np.ndarray]):
         """apply_activation.
 
         Parameters
         ----------
-        activation :
+        activation : Union[float, np.ndarray]
+            If array of activation is given, the shape of activation is expected to
+            match the shape of muscle_activation.
         """
         self.set_activation(self.activation, activation)
         for muscle in self.muscles:
@@ -363,18 +392,23 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
         muscle_activation[:] = activation
 
     def get_activation(self):
+        """
+        activation getter
+        """
         return self.activation
 
 
 class ApplyMuscles(ApplyActuations):
     """ApplyMuscles."""
 
-    def __init__(self, muscles, step_skip: int, callback_params_list: list):
+    def __init__(
+        self, muscles: Iterable[Muscle], step_skip: int, callback_params_list: list
+    ):
         """__init__.
 
         Parameters
         ----------
-        muscles :
+        muscles : Iterable[Muscle]
         step_skip : int
         callback_params_list : list
         """
@@ -411,16 +445,18 @@ class ApplyMuscles(ApplyActuations):
 class ApplyMuscleGroups(ApplyMuscles):
     """ApplyMuscleGroups."""
 
-    def __init__(self, muscle_groups, step_skip: int, callback_params_list: list):
+    def __init__(
+        self, muscle_groups: MuscleGroup, step_skip: int, callback_params_list: list
+    ):
         """__init__.
 
         Parameters
         ----------
-        muscle_groups :
+        muscle_groups : MuscleGroup
         step_skip : int
         callback_params_list : list
         """
-        ApplyMuscles.__init__(self, muscle_groups, step_skip, callback_params_list)
+        super.__init__(muscle_groups, step_skip, callback_params_list)
         for muscle_group, callback_params in zip(
             muscle_groups, self.callback_params_list
         ):
@@ -428,13 +464,15 @@ class ApplyMuscleGroups(ApplyMuscles):
                 defaultdict(list) for _ in muscle_group.muscles
             ]
 
-    def callback_func(self, muscle_groups, callback_params_list):
+    def callback_func(
+        self, muscle_groups: MuscleGroup, callback_params_list: Iterable[Dict]
+    ):
         """callback_func.
 
         Parameters
         ----------
-        muscle_groups :
-        callback_params_list :
+        muscle_groups : MuscleGroup, Iterable[Muscle]
+        callback_params_list : Iterable[Dict]
         """
         for muscle_group, callback_params in zip(muscle_groups, callback_params_list):
             callback_params["muscle_group_info"].append(str(muscle_group))

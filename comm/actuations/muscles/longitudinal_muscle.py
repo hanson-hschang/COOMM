@@ -36,9 +36,8 @@ class LongitudinalMuscle(MuscleForce):
         """
 
         # FIXME: I'm not sure keeping ratio_muscle_position name after the operation is good idea.
-        ratio_muscle_position = (
-            ratio_muscle_position
-            * np.array([[np.cos(muscle_init_angle)], [np.sin(muscle_init_angle)], [0]])
+        ratio_muscle_position = ratio_muscle_position * np.array(
+            [[np.cos(muscle_init_angle)], [np.sin(muscle_init_angle)], [0]]
         )
         super().__init__(
             ratio_muscle_position=ratio_muscle_position,
