@@ -47,12 +47,10 @@ class TransverseMuscle(MuscleForce):
         """
         blocksize = muscle_length.shape[0]
         for i in range(blocksize):
+            # fmt: off
             muscle_length[i] = (
-                1
-                / (
-                    muscle_strain[0, i] ** 2
-                    + muscle_strain[1, i] ** 2
-                    + muscle_strain[2, i] ** 2
-                )
-                ** 0.25
+                1 / (muscle_strain[0, i] ** 2 +  \
+                     muscle_strain[1, i] ** 2 +  \
+                     muscle_strain[2, i] ** 2) ** 0.25 \
             )
+            # fmt: on

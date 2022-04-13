@@ -185,9 +185,9 @@ class MuscleForce(Muscle):
 
     def __init__(
         self,
-        ratio_muscle_position,
-        rest_muscle_area,
-        max_muscle_stress: Union[float, np.array],
+        ratio_muscle_position: np.ndarray,
+        rest_muscle_area: np.ndarray,
+        max_muscle_stress: Union[float, np.ndarray],
         **kwargs,
     ):
         """
@@ -195,9 +195,12 @@ class MuscleForce(Muscle):
 
         Parameters
         ----------
-        ratio_muscle_position :
-        rest_muscle_area :
+        ratio_muscle_position : np.ndarray
+            shape: (3, n_element)
+        rest_muscle_area : np.ndarray
+            shape: (n_element)
         max_muscle_stress : Union[float, np.array]
+            shape: (n_element)
         """
         super().__init__(
             ratio_muscle_position=ratio_muscle_position,
@@ -220,7 +223,7 @@ class MuscleForce(Muscle):
         self.force_length_weight = kwargs.get("force_length_weight", unit_weight)
 
     def __call__(self, system):
-        Muscle.__call__(self, system)
+        super().__call__(system)
         self.calculate_muscle_length(self.muscle_length, self.muscle_strain)
         self.calculate_muscle_normalized_length(
             self.muscle_normalized_length, self.muscle_length, self.muscle_rest_length
