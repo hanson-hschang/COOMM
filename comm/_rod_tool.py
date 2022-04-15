@@ -305,9 +305,10 @@ def next_position(director, delta, positions):
 
 @njit(cache=True)
 def next_director(rotation, directors):
-    # The following should be the right implementation once the _get_rotation_matrix is fixed
-    Rotation = _get_rotation_matrix(-1, rotation.reshape((3, 1)))[:, :, 0]
-    # Rotation = _get_rotation_matrix(1, rotation.reshape((3, 1)))[:, :, 0]
+    # FIXME The following should be the right implementation once the _get_rotation_matrix is fixed
+    # Rotation = _get_rotation_matrix(-1, rotation.reshape((3, 1)))[:, :, 0]
+    
+    Rotation = _get_rotation_matrix(1, rotation.reshape((3, 1)))[:, :, 0]
     for i in range(3):
         for j in range(3):
             directors[i, j, 1] = 0
