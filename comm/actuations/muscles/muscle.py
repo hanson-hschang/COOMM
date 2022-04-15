@@ -25,7 +25,7 @@ from comm.actuations.actuation import (
 @njit(cache=True)
 def force_length_weight_guassian(
     muscle_length: np.ndarray, sigma: float = 0.25
-) -> npndarray:
+) -> np.ndarray:
     force_weight = np.exp(-0.5 * ((muscle_length - 1) / sigma) ** 2)
     return force_weight
 
