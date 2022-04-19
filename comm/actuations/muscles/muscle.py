@@ -95,15 +95,15 @@ class Muscle(ContinuousActuation, MuscleInfo):
         index : int
         """
         # This is not working for multiple inheritance. For example, it does not have the self.type_name defined in the MuslceInfo class
-        super().__init__(
-            n_elements=rest_muscle_area.shape[0],
-            type_name=type_name,
-            index=index,
-            **kwargs,
-        )
+        # super().__init__(
+        #     n_elements=rest_muscle_area.shape[0],
+        #     type_name=type_name,
+        #     index=index,
+        #     **kwargs,
+        # )
 
-        # ContinuousActuation.__init__(self, rest_muscle_area.shape[0], **kwargs)
-        # MuscleInfo.__init__(self, type_name, index, **kwargs)
+        ContinuousActuation.__init__(self, rest_muscle_area.shape[0], **kwargs)
+        MuscleInfo.__init__(self, type_name, index, **kwargs)
 
         self.s = np.linspace(0, 1, self.n_elements + 1)
         self.muscle_normalized_length = np.zeros(self.n_elements)
@@ -374,12 +374,12 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
         muscles : Iterable[Muscle]
         """
         # This is not working for multiple inheritance. For example, it does not have the self.type_name defined in the MuslceInfo class
-        super().__init__(
-            n_elements=muscles[0].n_elements, type_name=type_name, index=index
-        )
+        # super().__init__(
+        #     n_elements=muscles[0].n_elements, type_name=type_name, index=index
+        # )
 
-        # ContinuousActuation.__init__(self, muscles[0].n_elements, **kwargs)
-        # MuscleInfo.__init__(self, type_name, index, **kwargs)
+        ContinuousActuation.__init__(self, muscles[0].n_elements, **kwargs)
+        MuscleInfo.__init__(self, type_name, index, **kwargs)
 
         self.muscles = muscles
         for m, muscle in enumerate(self.muscles):
