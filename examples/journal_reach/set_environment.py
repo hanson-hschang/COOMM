@@ -8,6 +8,9 @@ import numpy as np
 
 import elastica as el
 from comm.callback_func import SphereCallBack
+
+import sys
+sys.path.append("../")          # include examples directory
 from set_arm_environment import ArmEnvironment
 
 class Environment(ArmEnvironment):
@@ -22,7 +25,7 @@ class Environment(ArmEnvironment):
 
         self.set_arm()
 
-        """ Set up a cylinder object """
+        """ Set up a sphere object """
         target_radius = 0.006
         self.sphere = el.Sphere(
             center=np.array([0.06, 0.06, 0.06]),
