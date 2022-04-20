@@ -55,7 +55,7 @@ class MuscleInfo:
     Data class to store muscle's meta data
     """
 
-    def __init__(self, type_name: str, index: int, **kwargs) -> None:
+    def __init__(self, type_name: str="muscle", index: int=0, **kwargs) -> None:
         """Muscle information constructor
 
         Parameters
@@ -65,6 +65,7 @@ class MuscleInfo:
         index : int
             Muscle index
         """
+        super().__init__()
         self.type_name = type_name
         self.index = index
 
@@ -79,7 +80,6 @@ class Muscle(ContinuousActuation, MuscleInfo):
         self,
         ratio_muscle_position: np.ndarray,
         rest_muscle_area: np.ndarray,
-        type_name: str = "muscle",
         index: int = 0,
         **kwargs,
     ) -> None:
@@ -91,19 +91,13 @@ class Muscle(ContinuousActuation, MuscleInfo):
             shape: (3, n_element)
         rest_muscle_area : np.ndarray
             shape: (n_element)
-        type_name : str
         index : int
         """
-        # This is not working for multiple inheritance. For example, it does not have the self.type_name defined in the MuslceInfo class
-        # super().__init__(
-        #     n_elements=rest_muscle_area.shape[0],
-        #     type_name=type_name,
-        #     index=index,
-        #     **kwargs,
-        # )
-
-        ContinuousActuation.__init__(self, rest_muscle_area.shape[0], **kwargs)
-        MuscleInfo.__init__(self, type_name, index, **kwargs)
+        super().__init__(
+            n_elements=rest_muscle_area.shape[0],
+            index=index,
+            **kwargs,
+        )
 
         self.s = np.linspace(0, 1, self.n_elements + 1)
         self.muscle_normalized_length = np.zeros(self.n_elements)
@@ -373,13 +367,9 @@ class MuscleGroup(ContinuousActuation, MuscleInfo):
         ----------
         muscles : Iterable[Muscle]
         """
-        # This is not working for multiple inheritance. For example, it does not have the self.type_name defined in the MuslceInfo class
-        # super().__init__(
-        #     n_elements=muscles[0].n_elements, type_name=type_name, index=index
-        # )
-
-        ContinuousActuation.__init__(self, muscles[0].n_elements, **kwargs)
-        MuscleInfo.__init__(self, type_name, index, **kwargs)
+        super().__init__(
+            n_elements=muscles[0].n_elements, type_name=type_name, index=index, **kwargs
+        )
 
         self.muscles = muscles
         for m, muscle in enumerate(self.muscles):
