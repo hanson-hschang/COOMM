@@ -91,11 +91,15 @@ class Cylinder(Object):
         position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
         radius = kwargs['radius']
         position_diff = position-self.position[:, None]
-        position_dist = np.linalg.norm(position_diff, axis=0)
+        vertical_dist = np.einsum("ij, i -> j", position_diff, self.director[2, :])
+        horizontal_position_diff = position_diff - vertical_dist * self.director[2, :, None]
+        position_dist = np.linalg.norm(horizontal_position_diff, axis=0)
         adjust_distance_ratio = (position_dist-(radius+self.radius))/position_dist
         adjust_distance_ratio[adjust_distance_ratio>0] = 0
+        adjust_distance_ratio[vertical_dist>self.length/2] = 0
+        adjust_distance_ratio[-vertical_dist>self.length/2] = 0
         self.cost_gradient.continuous.wrt_position[:, :] = (
-            self.cost_weight['position'] * position_diff * adjust_distance_ratio
+            self.cost_weight['position'] * horizontal_position_diff * adjust_distance_ratio
         )
 
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
@@ -164,6 +168,16 @@ class CylinderTarget(Cylinder, Target):
         position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
         radius = kwargs['radius']
         position_diff = position-self.position[:, None]
+        
+        # vertical_dist = np.einsum("ij, i -> j", position_diff, self.director[2, :])
+        # horizontal_position_diff = position_diff - vertical_dist * self.director[2, :, None]
+        # position_dist = np.linalg.norm(horizontal_position_diff, axis=0)
+        # adjust_distance_ratio = (position_dist-(radius+self.radius))/position_dist
+        # adjust_distance_ratio[adjust_distance_ratio<0] = 0
+        # self.cost_gradient.continuous.wrt_position[:, :] += (
+        #     self.cost_weight['position'] * horizontal_position_diff * adjust_distance_ratio
+        # )
+
         position_dist = np.linalg.norm(position_diff, axis=0)
         adjust_distance_ratio = (position_dist-(radius+self.radius))/position_dist
         
@@ -178,15 +192,24 @@ class CylinderTarget(Cylinder, Target):
         director = kwargs['director'][:, :, :]
         n_elems = director.shape[2]
         vector = np.zeros((3, n_elems))
+        coefficient = np.zeros(n_elems)
+        # for n in range(n_elems):
+        #     skew_symmetric_matrix = director[:, :, n] @ self.director.T - self.director @ director[:, :, n].T
+        #     vector[0, n] = skew_symmetric_matrix[1, 2]
+        #     vector[1, n] = -skew_symmetric_matrix[0, 2]
+        #     vector[2, n] = skew_symmetric_matrix[0, 1]
+        #     self.cost_gradient.continuous.wrt_director[:, n] = (
+        #         self.target_cost_weight['director'][n] * director[:, :, n].T @ vector[:, n]
+        #     )
+        
         for n in range(n_elems):
-            skew_symmetric_matrix = director[:, :, n] @ self.director.T - self.director @ director[:, :, n].T
-            vector[0, n] = skew_symmetric_matrix[1, 2]
-            vector[1, n] = -skew_symmetric_matrix[0, 2]
-            vector[2, n] = skew_symmetric_matrix[0, 1]
+            vector[1, n] = - np.dot(director[2, :, n], self.director[2, :])
+            vector[2, n] = np.dot(director[1, :, n], self.director[2, :])
+            coefficient[n] = np.dot(director[0, :, n], self.director[2, :])
             self.cost_gradient.continuous.wrt_director[:, n] = (
-                self.target_cost_weight['director'][n] * director[:, :, n].T @ vector[:, n]
+                self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
             )
-    
+
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
         """calculate_discrete_cost_gradient_wrt_position.
         """
