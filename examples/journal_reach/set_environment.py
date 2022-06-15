@@ -28,7 +28,7 @@ class Environment(ArmEnvironment):
         """ Set up a sphere object """
         target_radius = 0.006
         self.sphere = el.Sphere(
-            center=np.array([0.06, 0.06, 0.06]),
+            center=np.array([0.01, 0.15, 0.06]),
             base_radius=target_radius,
             density=1000
         )

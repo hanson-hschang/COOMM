@@ -8,50 +8,61 @@ import numpy as np
 from tqdm import tqdm
 
 import sys
-#sys.path.append("../")          # include examples directory
-#sys.path.append("../../")       # include ActuationModel directory
+sys.path.append("../")          # include examples directory
+# sys.path.append("../../")       # include comm directory
+
+from comm.objects import CylinderTarget
+from comm.algorithms import ForwardBackwardMuscle
+from comm.callback_func import AlgorithmMuscleCallBack
 
 from set_environment import Environment
 from plot_frames import Frame
 
-from comm.algorithms import ForwardBackwardMuscle
-from comm.objects import PointTarget
-from comm.callback_func import AlgorithmMuscleCallBack
+def data_for_cylinder_along_z(center_x,center_y,radius,height_z):
+    z = np.linspace(-height_z, height_z, 50)
+    theta = np.linspace(0, 2*np.pi, 50)
+    theta_grid, z_grid=np.meshgrid(theta, z)
+    x_grid = radius*np.cos(theta_grid) + center_x
+    y_grid = radius*np.sin(theta_grid) + center_y
+    return x_grid,y_grid,z_grid
 
 def get_algo(rod, muscles, target):
+    s = np.linspace(0, 1, rod.n_elems)
+    weight = np.zeros(s.shape)
+    weight = 0.5*(1+np.tanh((s-0.3)*100))
+    
     algo = ForwardBackwardMuscle(
         rod=rod,
         muscles=muscles,
-        algo_config = dict(
+        algo_config=dict(
             stepsize=1e-8,
             activation_diff_tolerance=1e-12
         ),
-        object=PointTarget.get_point_target_from_sphere(
-            sphere=target,
-            n_elements=1,
+        object=CylinderTarget.get_cylinder(
+            cylinder=target,
+            n_elements=100,
             cost_weight=dict(
-                position=0,
+                position=1e7*np.ones(s.shape),
                 director=0
             ),
             target_cost_weight=dict(
-                position=1e6,
-                director=1e3
+                position=1e6*weight,
+                director=1e3*weight
             ),
-            director_cost_flag=True,
         )
     )
-    director = np.eye(3)
-    base_to_target = algo.objects.position - rod.position_collection[:, 0]
-    tip_to_target = algo.objects.position - rod.position_collection[:, -1]
-    base_to_target /= np.linalg.norm(base_to_target)
-    tip_to_target /= np.linalg.norm(tip_to_target)
+    # director = np.eye(3)
+    # base_to_target = algo.objects.position - rod.position_collection[:, 0]
+    # tip_to_target = algo.objects.position - rod.position_collection[:, -1]
+    # base_to_target /= np.linalg.norm(base_to_target)
+    # tip_to_target /= np.linalg.norm(tip_to_target)
 
-    director[1, :] = np.cross(base_to_target, tip_to_target)
-    director[0, :] = np.cross(director[1, :], tip_to_target)
-    director[2, :] = np.cross(director[0, :], director[1, :])
+    # director[1, :] = np.cross(base_to_target, tip_to_target)
+    # director[0, :] = np.cross(director[1, :], tip_to_target)
+    # director[2, :] = np.cross(director[0, :], director[1, :])
 
-    algo.objects.director = director.copy()
-    target.director_collection[:, :, 0] = director.copy()
+    # algo.objects.director = director.copy()
+    # target.director_collection[:, :, 0] = director.copy()
     return algo
 
 def main(filename):
@@ -63,25 +74,21 @@ def main(filename):
     controller_Hz = 500
     controller_step_skip = int(1.0 / (controller_Hz * env.time_step))
 
-    """ Read arm params """
-    n_elements = systems[0].n_elems
-
-    activations = []
-    for m in range(len(env.muscle_groups)):
-        activations.append(
-            np.zeros(env.muscle_groups[m].activation.shape)
-        )
-
     """ Initialize algorithm """
     algo = get_algo(
-        rod=systems[0],
+        rod=systems[0], 
         muscles=env.muscle_groups,
         target=systems[1]
     )
     algo_callback = AlgorithmMuscleCallBack(step_skip=env.step_skip)
 
-    algo.run(max_iter_number=50_000)
-    
+    """ Run the algorithm """
+    # algo.run(max_iter_number=200_000)
+    algo.run(max_iter_number=100_000)
+    for activation in algo.activations:
+        print(max(activation))
+
+
     frame = Frame.get_frame(filename)
     L0 = frame.set_ref_configuration(
         position=systems[0].position_collection,
@@ -105,6 +112,14 @@ def main(filename):
         base[2],
         color='grey'
     )
+    cylinder = systems[1]
+    Xc,Yc,Zc = data_for_cylinder_along_z(
+        cylinder.position_collection[0, 0]/L0,
+        cylinder.position_collection[1, 0]/L0,
+        cylinder.radius/L0,
+        cylinder.length/L0/2
+    )
+    ax_main.plot_surface(Xc, Yc, Zc, alpha=0.5)
 
     for i in range(3):
         director_line = np.zeros((3, 2))
@@ -144,24 +159,34 @@ def main(filename):
     )
 
     frame.show()
-    
+    # quit()
+
+
+    activations = []
+    for m in range(len(env.muscle_groups)):
+        activations.append(
+            np.zeros(env.muscle_groups[m].activation.shape)
+        )
+
     """ Start the simulation """
     print("Running simulation ...")
     time = np.float64(0.0)
-    weight_start_time = np.float64(0.0)
     for k_sim in tqdm(range(total_steps)):
 
         if (k_sim % controller_step_skip) == 0:
             # controller implementation
-            weight = np.min([1., (time-weight_start_time)/1.])
+            weight = np.min([1., time/1.])
             for m in range(len(activations)):
                 activations[m] = weight*algo.activations[m]
-
+     
         algo_callback.make_callback(algo, time, k_sim)
         time, systems, done = env.step(time, activations)
         if done:
+            print("Exiting simulation with error(s) occured ...")
             break
-
+    if not done:
+        print("Simulation completed ...")
+        
     """ Save the data of the simulation """
     env.save_data(
         filename=filename,

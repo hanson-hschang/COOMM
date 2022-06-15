@@ -301,10 +301,9 @@ def main(filename):
     with open(filename+"_data.pickle", "rb") as f:
         data = pickle.load(f)
         rod_data = data['systems'][0]
-        sphere_data = data['systems'][1]
+        cylinder_data = data['systems'][1]
         muscle_groups_data = data['muscle_groups']
         algo_data = data['algo']
-        recording_fps = data['recording_fps']
 
     with open(filename+"_systems.pickle", "rb") as f:
         data = pickle.load(f)
@@ -337,13 +336,24 @@ def main(filename):
             radius=rod_data["radius"][k]
         )
 
-        ax_main.scatter(
-            sphere_data["position"][k][0, 0]/L0,
-            sphere_data["position"][k][1, 0]/L0,
-            sphere_data["position"][k][2, 0]/L0,
-            color='grey'
+        Xc,Yc,Zc = data_for_cylinder_along_z(
+            cylinder_data["position"][k][0, 0]/L0,
+            cylinder_data["position"][k][1, 0]/L0,
+            cylinder_data["radius"][k]/L0,
+            cylinder_data["height"][k]/L0/2
         )
+        ax_main.plot_surface(Xc, Yc, Zc, alpha=0.5)
 
+        # base = rod_data["position"][k][:, -1]/L0
+        # for i in range(3):
+        #     director_line = np.zeros((3, 2))
+        #     director_line[:, 0] = base.copy()
+        #     director_line[:, 1] = base + rod_data["director"][k][i, :, -1] * 0.1
+        #     ax_main.plot(
+        #         director_line[0], director_line[1], director_line[2],
+        #         color='red',
+        #     )
+        
         for muscle_group_data in muscle_groups_data:
             muscle_info = muscle_group_data['muscle_group_info'][k].split('_')
             group_number, muscle_group_type = (
@@ -395,7 +405,7 @@ def main(filename):
         frame.save()
 
     frame.movie(
-        frame_rate=recording_fps,
+        frame_rate=30,
         movie_name=filename+"_muscle_movie"
     )
 
