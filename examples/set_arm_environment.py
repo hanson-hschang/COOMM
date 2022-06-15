@@ -122,9 +122,12 @@ class ArmEnvironment:
             )
 
             # stress is in unit [Pa]
-            TM_max_muscle_stress = 15_000.0
-            LM_max_muscle_stress = 50_000.0
-            OM_max_muscle_stress = 50_000.0
+            # TM_max_muscle_stress = 15_000.0
+            # LM_max_muscle_stress = 50_000.0
+            # OM_max_muscle_stress = 500_000.0
+            TM_max_muscle_stress =  15_000.0
+            LM_max_muscle_stress =  10_000.0
+            OM_max_muscle_stress = 100_000.0
 
             muscle_dict = dict(
                 force_length_weight=force_length_weight_poly,
