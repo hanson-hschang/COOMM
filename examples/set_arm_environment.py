@@ -73,7 +73,8 @@ class ArmEnvironment:
             density=1050,
             nu=damp_coefficient*((radius_mean/radius_base)**2),
             youngs_modulus=10_000,
-            poisson_ratio=0.5,
+            shear_modulus=10_000 / (2*(1 + 0.5)),
+            # poisson_ratio=0.5, Default is 0.5
             nu_for_torques=damp_coefficient*((radius_mean/radius_base)**4),
         )
         self.simulator.append(self.shearable_rod)

@@ -52,6 +52,7 @@ class ContinuousActuation:
     """
 
     def __init__(self, n_elements: int, **kwargs):
+        super().__init__()
         self.n_elements = n_elements
         self.internal_force = np.zeros((3, n_elements))       # material frame
         self.external_force = np.zeros((3, n_elements+1))     # lab frame
