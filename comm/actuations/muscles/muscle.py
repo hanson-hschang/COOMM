@@ -65,7 +65,7 @@ class MuscleInfo:
         index : int
             Muscle index
         """
-        super().__init__()
+        super().__init__(**kwargs)
         self.type_name = type_name
         self.index = index
 
@@ -73,7 +73,7 @@ class MuscleInfo:
         return f"{self.index}_{self.type_name}"
 
 
-class Muscle(ContinuousActuation, MuscleInfo):
+class Muscle(MuscleInfo, ContinuousActuation):
     """Muscle base class"""
 
     def __init__(
@@ -349,7 +349,7 @@ class MuscleForce(Muscle):
         return self.activation
 
 
-class MuscleGroup(ContinuousActuation, MuscleInfo):
+class MuscleGroup(MuscleInfo, ContinuousActuation):
     """MuscleGroup.
     Group of muscle. Provides convinience tools to operate group-activation.
     """
