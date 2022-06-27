@@ -189,6 +189,7 @@ class CylinderTarget(Cylinder, Target):
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
         """calculate_continuous_cost_gradient_wrt_director.
         """
+        position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
         director = kwargs['director'][:, :, :]
         n_elems = director.shape[2]
         vector = np.zeros((3, n_elems))
@@ -207,6 +208,18 @@ class CylinderTarget(Cylinder, Target):
             vector[2, n] = np.dot(director[1, :, n], self.director[2, :])
             coefficient[n] = np.dot(director[0, :, n], self.director[2, :])
             self.cost_gradient.continuous.wrt_director[:, n] = (
+                self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
+            )
+
+        vector = np.zeros((3, n_elems))
+        coefficient = np.zeros(n_elems)
+        for n in range(n_elems):
+            position_diff = self.position - position[:, n]
+            position_diff = position_diff / np.linalg.norm(position_diff)
+            vector[1, n] = - np.dot(director[2, :, n], position_diff)
+            vector[2, n] = np.dot(director[1, :, n], position_diff)
+            coefficient[n] = min(np.dot(self.director[0, :], position_diff), 0)
+            self.cost_gradient.continuous.wrt_director[:, n] += (
                 self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
             )
 
