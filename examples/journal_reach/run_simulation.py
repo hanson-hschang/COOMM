@@ -143,7 +143,7 @@ def main(filename):
         kappa=algo.static_rod.kappa
     )
 
-    frame.show()
+    # frame.show()
     
     """ Start the simulation """
     print("Running simulation ...")

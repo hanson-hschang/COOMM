@@ -22,9 +22,10 @@ class Environment(ArmEnvironment):
         return [self.rod_parameters_dict, self.sphere_parameters_dict]
 
     def setup(self):
-
         self.set_arm()
+        self.set_target()
 
+    def set_target(self):
         """ Set up a sphere object """
         target_radius = 0.006
         self.sphere = el.Sphere(

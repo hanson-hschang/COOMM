@@ -85,6 +85,7 @@ def main(filename):
     """ Run the algorithm """
     # algo.run(max_iter_number=200_000)
     algo.run(max_iter_number=100_000)
+    # algo.run(max_iter_number=10_000)
     for activation in algo.activations:
         print(max(activation))
 
