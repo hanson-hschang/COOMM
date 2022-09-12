@@ -1,10 +1,10 @@
 <div align=center>
-  <h1>Control Oriented Muscle Model (COMM)</h1>
+  <h1>Control Oriented Octopus Muscle Model (COOMM)</h1>
 </div>
 
 ## Project Description
 
-Control Oriented Muscle Model of an octopus arm
+Control Oriented Muscle Model for an octopus arm.
 
 ## Install
 
