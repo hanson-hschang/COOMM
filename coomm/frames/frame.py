@@ -6,7 +6,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
-from comm._rendering_tool import check_folder
+from coomm._rendering_tool import check_folder
 
 class FrameBase:
     """FrameBase.

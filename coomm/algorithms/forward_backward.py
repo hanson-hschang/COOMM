@@ -5,7 +5,7 @@ Forward Backward algorithm module.
 from tqdm import tqdm
 import numpy as np
 
-from comm.algorithms.algorithm import Algorithm
+from coomm.algorithms.algorithm import Algorithm
 
 class ForwardBackward(Algorithm):
     """ForwardBackward.

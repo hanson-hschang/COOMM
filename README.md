@@ -11,7 +11,7 @@ Control Oriented Muscle Model for an octopus arm.
 The package can be installed using standard python package installer (pip):
 
 ```bash
-pip install comm
+pip install coomm
 ```
 
 or from source code:

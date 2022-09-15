@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from mpl_toolkits.mplot3d import Axes3D
 
-from comm.frames.frame import FrameBase
-from comm.frames.frame_tools import (
+from coomm.frames.frame import FrameBase
+from coomm.frames.frame_tools import (
     default_colors,
     default_label_fontsize,
     change_box_to_arrow_axes,
@@ -17,7 +17,7 @@ from comm.frames.frame_tools import (
     add_y_ticks
 )
 
-from comm._rendering_tool import (
+from coomm._rendering_tool import (
     process_position, process_director
 )
 

@@ -7,7 +7,7 @@ from shutil import rmtree
 
 from setuptools import Command, find_packages, setup
 
-from comm.version import VERSION
+from coomm.version import VERSION
 
 # Package meta-data.
 NAME = "COOMM"
@@ -91,7 +91,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     #packages=[""],
-    package_dir={"comm": "./comm"},
+    package_dir={"coomm": "./coomm"},
     packages=find_packages(),
     license="MIT",
     classifiers=[

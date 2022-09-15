@@ -4,7 +4,7 @@ Created on Feb. 21, 2021
 """
 
 import numpy as np
-from comm._rod_tool import _material_to_lab
+from coomm._rod_tool import _material_to_lab
 
 class POVRAYMuscle:
     def __init__(self, muscle_color, activation_color):

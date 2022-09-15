@@ -3,7 +3,7 @@ Base algorithm class
 """
 
 import numpy as np
-from comm._rod_tool import StaticRod
+from coomm._rod_tool import StaticRod
 
 class Algorithm:  # TODO: maybe rename the class??
     """Algorithm.

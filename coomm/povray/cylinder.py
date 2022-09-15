@@ -4,7 +4,7 @@ Created on Jan. 11, 2022
 """
 
 import numpy as np
-from comm.povray.povray_base import POVRAYBase
+from coomm.povray.povray_base import POVRAYBase
 
 class POVRAYCylinder(POVRAYBase):
     def __init__(self, **kwargs):

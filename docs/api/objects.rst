@@ -5,20 +5,20 @@ Objects
 Bass Module
 -----------
 
-.. automodule:: comm.objects.object
+.. automodule:: coomm.objects.object
    :members:
 
 Object Modules
 --------------
 
-.. automodule:: comm.objects.point
+.. automodule:: coomm.objects.point
    :members:
 
-.. automodule:: comm.objects.target
+.. automodule:: coomm.objects.target
    :members:
 
-.. automodule:: comm.objects.cylinder
+.. automodule:: coomm.objects.cylinder
    :members:
 
-.. automodule:: comm.objects.director_constraint
+.. automodule:: coomm.objects.director_constraint
    :members:

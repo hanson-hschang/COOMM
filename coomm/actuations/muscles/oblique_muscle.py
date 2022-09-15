@@ -7,7 +7,7 @@ from typing import Union
 import numpy as np
 from numba import njit
 
-from comm.actuations.muscles.muscle import MuscleForce
+from coomm.actuations.muscles.muscle import MuscleForce
 
 
 class ObliqueMuscle(MuscleForce):

@@ -10,7 +10,7 @@ from elastica.external_forces import inplace_addition
 
 from elastica.external_forces import NoForces
 
-from comm._rod_tool import _lab_to_material, _material_to_lab, average2D
+from coomm._rod_tool import _lab_to_material, _material_to_lab, average2D
 
 
 class DragForce(NoForces):

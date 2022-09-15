@@ -17,7 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../'))
 
-from comm.version import VERSION
+from coomm.version import VERSION
 
 
 # -- Project information -----------------------------------------------------

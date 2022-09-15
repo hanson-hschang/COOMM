@@ -7,7 +7,7 @@ from collections import defaultdict
 import numpy as np
 
 import elastica as el
-from comm.callback_func import SphereCallBack
+from coomm.callback_func import SphereCallBack
 
 import sys
 sys.path.append("../")          # include examples directory

@@ -3,8 +3,8 @@ Created on Dec. 21, 2021
 @author: Heng-Sheng (Hanson) Chang
 """
 
-from comm.povray import POVRAYBase
-from comm.povray.muscles.muscle import POVRAYSlenderMuscle
+from coomm.povray import POVRAYBase
+from coomm.povray.muscles.muscle import POVRAYSlenderMuscle
 
 class POVRAYLongitudinalMuscle(POVRAYBase, POVRAYSlenderMuscle):
     def __init__(self, **kwargs):

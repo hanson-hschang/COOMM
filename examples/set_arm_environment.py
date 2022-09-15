@@ -10,8 +10,8 @@ from elastica import *
 from elastica.timestepper import extend_stepper_interface
 from elastica._calculus import _isnan_check
 
-from comm.actuations.muscles import force_length_weight_guassian, force_length_weight_poly
-from comm.actuations.muscles import (
+from coomm.actuations.muscles import force_length_weight_guassian, force_length_weight_poly
+from coomm.actuations.muscles import (
     MuscleGroup,
     LongitudinalMuscle,
     ObliqueMuscle,
@@ -19,8 +19,8 @@ from comm.actuations.muscles import (
     ApplyMuscleGroups
 )
 
-from comm.forces import DragForce
-from comm.callback_func import RodCallBack, CylinderCallBack
+from coomm.forces import DragForce
+from coomm.callback_func import RodCallBack, CylinderCallBack
 
 class BaseSimulator(BaseSystemCollection, Constraints, Connections, Forcing, CallBacks):
     pass

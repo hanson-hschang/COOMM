@@ -5,14 +5,14 @@ Algorithms
 Bass Module
 -----------
 
-.. automodule:: comm.algorithms.algorithm
+.. automodule:: coomm.algorithms.algorithm
    :members:
 
 Forward Backward
 ----------------
 
-.. automodule:: comm.algorithms.forward_backward
+.. automodule:: coomm.algorithms.forward_backward
    :members:
 
-.. automodule:: comm.algorithms.forward_backward_muscle
+.. automodule:: coomm.algorithms.forward_backward_muscle
    :members:

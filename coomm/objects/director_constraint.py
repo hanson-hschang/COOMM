@@ -4,8 +4,8 @@ Director constraint object implementation
 
 import numpy as np
 
-from comm.objects.object import Object
-from comm.objects.target import Target
+from coomm.objects.object import Object
+from coomm.objects.target import Target
 
 class DirectorConstraint(Object, Target):
     """DirectorConstraint.
