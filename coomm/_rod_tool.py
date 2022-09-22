@@ -297,10 +297,11 @@ class StaticRod:
 
 @njit(cache=True)
 def next_position(director, delta, positions):
+    positions[:, 1] = positions[:, 0]
     for i in range(3):
         for j in range(3):
-            positions[i, 1] = (
-                positions[i, 0] + director[j, i] * delta[j]
+            positions[i, 1] += (
+                director[j, i] * delta[j]
             )
 
 @njit(cache=True)
