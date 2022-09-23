@@ -305,10 +305,10 @@ def main(filename):
         muscle_groups_data = data['muscle_groups']
         algo_data = data['algo']
 
-    with open(filename+"_systems.pickle", "rb") as f:
-        data = pickle.load(f)
-        rod = data['systems'][0]
-        muscle_groups = data['muscle_groups']
+    # with open(filename+"_systems.pickle", "rb") as f:
+    #     data = pickle.load(f)
+    #     rod = data['systems'][0]
+    #     muscle_groups = data['muscle_groups']
     
     frame = Frame.get_frame(filename=filename)
 

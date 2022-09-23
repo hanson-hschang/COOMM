@@ -24,8 +24,10 @@ class Environment(ArmEnvironment):
 
         """ Set up a cylinder object """
         self.cylinder = el.Cylinder(
-            start=np.array([0.06, -0.04, -0.18]),
+            start=np.array([0.06, -0.05, -0.18]),
+            # start=np.array([0.06, -0.04, -0.18]),
             # start=np.array([0.04, 0, -0.22]),
+            
             direction=np.array([0.0, 0.0, 1.0]),
             normal=np.array([1.0, 0.0, 0.0]),
             base_length=0.4,

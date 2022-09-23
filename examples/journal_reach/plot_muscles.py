@@ -13,7 +13,7 @@ from matplotlib import rc
 rc('text', usetex=True)
 
 import sys
-sys.path.append("../../")       # include ActuationModel directory
+sys.path.append("../")       # include ActuationModel directory
 
 from comm.frames import (
     RodFrame,
