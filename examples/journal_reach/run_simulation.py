@@ -14,9 +14,9 @@ import sys
 from set_environment import Environment
 from plot_frames import Frame
 
-from comm.algorithms import ForwardBackwardMuscle
-from comm.objects import PointTarget
-from comm.callback_func import AlgorithmMuscleCallBack
+from coomm.algorithms import ForwardBackwardMuscle
+from coomm.objects import PointTarget
+from coomm.callback_func import AlgorithmMuscleCallBack
 
 def get_algo(rod, muscles, target):
     algo = ForwardBackwardMuscle(

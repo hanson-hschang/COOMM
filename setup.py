@@ -7,15 +7,15 @@ from shutil import rmtree
 
 from setuptools import Command, find_packages, setup
 
-from comm.version import VERSION
+from coomm.version import VERSION
 
 # Package meta-data.
-NAME = "COMM"
+NAME = "COOMM"
 DESCRIPTION = "Control Oriented Muscle Model of an octopus arm"
-URL = "https://github.com/hanson-hschang/COMM"
+URL = "https://github.com/hanson-hschang/COOMM"
 EMAIL = "hschang2@illinois.edu"
 AUTHOR = "Heng-Sheng Chang'"
-REQUIRES_PYTHON = ">=3.6.0"
+REQUIRES_PYTHON = ">=3.7.0"
 
 # What packages are required for this module to be executed?
 REQUIRED = ["matplotlib>=0.2.2.post2"]
@@ -91,21 +91,23 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     #packages=[""],
-    package_dir={"comm": "./comm"},
+    package_dir={"coomm": "./coomm"},
     packages=find_packages(),
     license="MIT",
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "License :: OSI Approved :: MIT License",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Education",
     ],
-    download_url=f"https://github.com/hanson-hschang/COMM/archive/refs/tags/{VERSION}.tar.gz",
+    download_url=f"https://github.com/hanson-hschang/COOMM/archive/refs/tags/{VERSION}.tar.gz",
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     cmdclass={

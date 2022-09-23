@@ -5,23 +5,23 @@ Frames
 Bass Module
 -----------
 
-.. automodule:: comm.frames.frame
+.. automodule:: coomm.frames.frame
    :members:
 
 Frame Modules
 -------------
 
-.. automodule:: comm.frames.rod_frame
+.. automodule:: coomm.frames.rod_frame
    :members:
 
-.. automodule:: comm.frames.muscle_frame
+.. automodule:: coomm.frames.muscle_frame
    :members:
 
-.. automodule:: comm.frames.rigidbody_frame
+.. automodule:: coomm.frames.rigidbody_frame
    :members:
 
 Frame Tools
 -----------
 
-.. automodule:: comm.frames.frame_tools
+.. automodule:: coomm.frames.frame_tools
    :members:

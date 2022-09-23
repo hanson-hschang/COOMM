@@ -5,5 +5,5 @@ Force
 Available Modules
 -----------------
 
-.. automodule:: comm.forces.drag_force
+.. automodule:: coomm.forces.drag_force
    :members:

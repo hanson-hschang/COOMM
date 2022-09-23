@@ -15,14 +15,14 @@ rc('text', usetex=True)
 import sys
 sys.path.append("../")       # include ActuationModel directory
 
-from comm.frames import (
+from coomm.frames import (
     RodFrame,
     TransverseMuscleFrame,
     LongitudinalMuscleFrame,
     ObliqueMuscleFrame,
     MuscleFrameBase
 )
-from comm.frames.muscle_frame import (
+from coomm.frames.muscle_frame import (
     muscle_length_color,
     muscle_force_weight_color,
     muscles_color

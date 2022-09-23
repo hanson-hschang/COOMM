@@ -14,7 +14,7 @@ rc('text', usetex=True)
 import sys
 sys.path.append("../../")       # include ActuationModel directory
 
-from comm.frames import RodFrame, StrainFrame
+from coomm.frames import RodFrame, StrainFrame
 
 def data_for_cylinder_along_z(center_x,center_y,radius,height_z):
     z = np.linspace(-height_z, height_z, 50)

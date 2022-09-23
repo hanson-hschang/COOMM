@@ -9,11 +9,11 @@ from tqdm import tqdm
 
 import sys
 sys.path.append("../")          # include examples directory
-# sys.path.append("../../")       # include comm directory
+# sys.path.append("../../")       # include coomm directory
 
-from comm.objects import CylinderTarget
-from comm.algorithms import ForwardBackwardMuscle
-from comm.callback_func import AlgorithmMuscleCallBack
+from coomm.objects import CylinderTarget
+from coomm.algorithms import ForwardBackwardMuscle
+from coomm.callback_func import AlgorithmMuscleCallBack
 
 from set_environment import Environment
 from plot_frames import Frame

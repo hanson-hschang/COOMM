@@ -15,7 +15,7 @@ import sys
 sys.path.append("../") # include elastica-python directory
 sys.path.append("../../")       # include ActuationModel directory
 
-from comm.frames import RodFrame, StrainFrame
+from coomm.frames import RodFrame, StrainFrame
 
 class Frame(RodFrame, StrainFrame):
     def __init__(self, file_dict, fig_dict, gs_dict, **kwargs):

@@ -5,20 +5,20 @@ Actuation
 Base Modules
 ------------
 
-.. automodule:: comm.actuations.actuation
+.. automodule:: coomm.actuations.actuation
    :members:
 
 Muscle Modules
 --------------
 
-.. automodule:: comm.actuations.muscles.muscle
+.. automodule:: coomm.actuations.muscles.muscle
    :members:
 
-.. automodule:: comm.actuations.muscles.longitudinal_muscle
+.. automodule:: coomm.actuations.muscles.longitudinal_muscle
    :members:
 
-.. automodule:: comm.actuations.muscles.transverse_muscle
+.. automodule:: coomm.actuations.muscles.transverse_muscle
    :members:
 
-.. automodule:: comm.actuations.muscles.oblique_muscle
+.. automodule:: coomm.actuations.muscles.oblique_muscle
    :members:
