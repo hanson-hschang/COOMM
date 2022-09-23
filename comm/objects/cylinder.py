@@ -186,14 +186,52 @@ class CylinderTarget(Cylinder, Target):
             self.target_cost_weight['position'] * position_diff * adjust_distance_ratio
         )
     
+    """ The first method """
+    # def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
+    #     """calculate_continuous_cost_gradient_wrt_director.
+    #     """
+    #     position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
+    #     director = kwargs['director'][:, :, :]
+    #     n_elems = director.shape[2]
+    #     vector = np.zeros((3, n_elems))
+    #     coefficient = np.zeros(n_elems)
+    #     # for n in range(n_elems):
+    #     #     skew_symmetric_matrix = director[:, :, n] @ self.director.T - self.director @ director[:, :, n].T
+    #     #     vector[0, n] = skew_symmetric_matrix[1, 2]
+    #     #     vector[1, n] = -skew_symmetric_matrix[0, 2]
+    #     #     vector[2, n] = skew_symmetric_matrix[0, 1]
+    #     #     self.cost_gradient.continuous.wrt_director[:, n] = (
+    #     #         self.target_cost_weight['director'][n] * director[:, :, n].T @ vector[:, n]
+    #     #     )
+        
+    #     for n in range(n_elems):
+    #         vector[1, n] = - np.dot(director[2, :, n], self.director[2, :])
+    #         vector[2, n] = np.dot(director[1, :, n], self.director[2, :])
+    #         coefficient[n] = np.dot(director[0, :, n], self.director[2, :])
+    #         self.cost_gradient.continuous.wrt_director[:, n] = (
+    #             self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
+    #         )
+
+    #     vector = np.zeros((3, n_elems))
+    #     coefficient = np.zeros(n_elems)
+    #     for n in range(n_elems):
+    #         position_diff = self.position - position[:, n]
+    #         position_diff = position_diff / np.linalg.norm(position_diff)
+    #         vector[1, n] = - np.dot(director[2, :, n], position_diff)
+    #         vector[2, n] = np.dot(director[1, :, n], position_diff)
+    #         coefficient[n] = min(np.dot(self.director[0, :], position_diff), 0)
+    #         self.cost_gradient.continuous.wrt_director[:, n] += (
+    #             self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
+    #         )
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
         """calculate_continuous_cost_gradient_wrt_director.
         """
         position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
         director = kwargs['director'][:, :, :]
         n_elems = director.shape[2]
-        vector = np.zeros((3, n_elems))
-        coefficient = np.zeros(n_elems)
+
+        # vector = np.zeros((3, n_elems))
+        # coefficient = np.zeros(n_elems)
         # for n in range(n_elems):
         #     skew_symmetric_matrix = director[:, :, n] @ self.director.T - self.director @ director[:, :, n].T
         #     vector[0, n] = skew_symmetric_matrix[1, 2]
@@ -203,25 +241,45 @@ class CylinderTarget(Cylinder, Target):
         #         self.target_cost_weight['director'][n] * director[:, :, n].T @ vector[:, n]
         #     )
         
-        for n in range(n_elems):
-            vector[1, n] = - np.dot(director[2, :, n], self.director[2, :])
-            vector[2, n] = np.dot(director[1, :, n], self.director[2, :])
-            coefficient[n] = np.dot(director[0, :, n], self.director[2, :])
-            self.cost_gradient.continuous.wrt_director[:, n] = (
-                self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
-            )
+        # for n in range(n_elems):
+        #     vector[1, n] = - np.dot(director[2, :, n], self.director[2, :])
+        #     vector[2, n] = np.dot(director[1, :, n], self.director[2, :])
+        #     coefficient[n] = np.dot(director[0, :, n], self.director[2, :])
+        #     self.cost_gradient.continuous.wrt_director[:, n] = (
+        #         self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
+        #     )
 
+
+
+        """ The second method """
         vector = np.zeros((3, n_elems))
         coefficient = np.zeros(n_elems)
         for n in range(n_elems):
             position_diff = self.position - position[:, n]
             position_diff = position_diff / np.linalg.norm(position_diff)
-            vector[1, n] = - np.dot(director[2, :, n], position_diff)
-            vector[2, n] = np.dot(director[1, :, n], position_diff)
-            coefficient[n] = min(np.dot(self.director[0, :], position_diff), 0)
-            self.cost_gradient.continuous.wrt_director[:, n] += (
+            vector[1, n] = - np.dot(director[2, :, n], -position_diff)
+            vector[2, n] = np.dot(director[1, :, n], -position_diff)
+            # coefficient[n] = 1-np.dot(director[0, :, n], position_diff)
+            coefficient[n] = 1
+            self.cost_gradient.continuous.wrt_director[:, n] = (
                 self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
             )
+
+        """ The third method """
+        # vector = np.zeros((3, n_elems))
+        # coefficient = np.zeros(n_elems)
+        # for n in range(n_elems):
+        #     position_diff = self.position - position[:, n]
+        #     position_diff = position_diff - np.dot(position_diff, self.director[2, :]) * self.director[2, :]
+        #     position_diff = position_diff / np.linalg.norm(position_diff)
+        #     vector[1, n] = - np.dot(director[2, :, n], -position_diff)
+        #     vector[2, n] = np.dot(director[1, :, n], -position_diff)
+        #     # coefficient[n] = 1 - np.dot(director[0, :, n], position_diff)
+        #     coefficient[n] = 1 
+        #     # print(position_diff)
+        #     self.cost_gradient.continuous.wrt_director[:, n] = (
+        #         self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
+        #     )
 
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
         """calculate_discrete_cost_gradient_wrt_position.
