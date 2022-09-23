@@ -190,7 +190,7 @@ class ForwardBackwardMuscle(ForwardBackward):
         # n_s = f
         for k in range(blocksize-1):
             internal_force_lab_frame[:, -1-k-1] = internal_force_lab_frame[:, -1-k] - (
-                force_derivative[:, -1-k] * rest_lengths[-1-k] * dilatation[-1-k]
+                force_derivative[:, -1-k] * 0.5 * (rest_lengths[-1-k] * dilatation[-1-k] + rest_lengths[-1-k-1] * dilatation[-1-k-1])
             )
         internal_force[:, :] = _lab_to_material(director, internal_force_lab_frame)
 
@@ -203,7 +203,7 @@ class ForwardBackwardMuscle(ForwardBackward):
         couple_derivative = average2D(internal_couple_lab_frame_derivative)
         for k in range(blocksize-1):
             internal_couple_lab_frame[:, -1-k-1] = internal_couple_lab_frame[:, -1-k] - (
-                couple_derivative[:, -1-k] * rest_lengths[-1-k] * dilatation[-1-k]
+                couple_derivative[:, -1-k] * 0.5 * (rest_lengths[-1-k] * dilatation[-1-k] + rest_lengths[-1-k-1] * dilatation[-1-k-1])
             )
         internal_couple[:, :] = average2D(
             _lab_to_material(director, internal_couple_lab_frame)
@@ -249,11 +249,21 @@ class ForwardBackwardMuscle(ForwardBackward):
         )
         temp_force_innerproduct = np.zeros(blocksize)
         temp_couple_innerproduct = np.zeros(blocksize+1)
-        for k in range(blocksize-1):
+        # for k in range(blocksize-1):
+        #     for i in range(3):
+        #         temp_force_innerproduct[k] += internal_force[i, k] * temp_shear[i, k]
+        #         temp_couple_innerproduct[k+1] += internal_couple[i, k+1] * temp_kappa[i, k+1]
+        # temp_force_innerproduct[-1] += internal_force[i, -1] * temp_shear[i, -1]
+
+        for k in range(blocksize):
             for i in range(3):
                 temp_force_innerproduct[k] += internal_force[i, k] * temp_shear[i, k]
-                temp_couple_innerproduct[k+1] += internal_couple[i, k+1] * temp_kappa[i, k+1]
-        temp_force_innerproduct[-1] += internal_force[i, -1] * temp_shear[i, -1]
+        for k in range(blocksize-1):
+            for i in range(3):
+                temp_couple_innerproduct[k+1] += internal_couple[i, k] * temp_kappa[i, k]
+        temp_couple_innerproduct[0] = 2*temp_couple_innerproduct[1]-temp_couple_innerproduct[2]
+        temp_couple_innerproduct[-1] = 2*temp_couple_innerproduct[-2]-temp_couple_innerproduct[-3]
+
         for k in range(blocksize):
             target_activation[k] = -temp_force_innerproduct[k] - 0.5*(
                 temp_couple_innerproduct[k] + temp_couple_innerproduct[k+1]
