@@ -6,11 +6,6 @@ Created on Sep. 23, 2021
 import numpy as np
 from tqdm import tqdm
 
-<<<<<<< HEAD
-from comm.objects import CylinderTarget
-from comm.algorithms import ForwardBackwardMuscle
-from comm.callback_func import AlgorithmMuscleCallBack
-=======
 import sys
 sys.path.append("../")          # include examples directory
 # sys.path.append("../../")       # include coomm directory
@@ -18,7 +13,6 @@ sys.path.append("../")          # include examples directory
 from coomm.objects import CylinderTarget
 from coomm.algorithms import ForwardBackwardMuscle
 from coomm.callback_func import AlgorithmMuscleCallBack
->>>>>>> a56b1f074a5ff25eefc5540622b9d0cf509811d8
 
 from set_environment import Environment
 from plot_frames import Frame
