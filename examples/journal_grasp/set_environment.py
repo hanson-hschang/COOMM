@@ -14,9 +14,6 @@ sys.path.append("../")          # include examples directory
 from set_arm_environment import ArmEnvironment
 
 class Environment(ArmEnvironment):
-
-    def get_systems(self,):
-        return [self.shearable_rod, self.cylinder]
     
     def get_data(self,):
         return [self.rod_parameters_dict, self.cylinder_parameters_dict]

@@ -37,7 +37,7 @@ class ArmEnvironment:
         self.step_skip = int(1.0 / (self.recording_fps * self.time_step))
 
     def get_systems(self,):
-        return [self.shearable_rod]
+        return self.simulator
     
     def get_data(self,):
         return [self.rod_parameters_dict]
