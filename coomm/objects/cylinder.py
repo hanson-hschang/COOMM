@@ -79,7 +79,7 @@ class Cylinder(Object):
         cost_weight :
             cost_weight
         """
-        return Cylinder(
+        return cls(
             cylinder.position_collection[:, 0].copy(),
             cylinder.director_collection[:, :, 0].copy(),
             n_elements, cost_weight
