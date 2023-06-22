@@ -87,13 +87,13 @@ class ApplyActuations(NoForces):
         self.every = step_skip
         self.callback_params_list = callback_params_list
 
-    def apply_torques(self, system, time: np.float = 0.0):
+    def apply_torques(self, system, time: np.float64 = 0.0):
         """apply_torques.
 
         Parameters
         ----------
         system :
-        time : np.float
+        time : np.float64
         """
         for actuation in self.actuations:
             actuation(system)

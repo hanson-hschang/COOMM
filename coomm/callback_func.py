@@ -4,7 +4,7 @@ Common callback function used in COMM.
 
 from collections import defaultdict
 
-from elastica.wrappers import callbacks
+from elastica.modules import callbacks
 
 from elastica.callback_functions import CallBackBaseClass
 
