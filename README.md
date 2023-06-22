@@ -21,6 +21,11 @@ cd <repository directory>
 git clone https://github.com/hanson-hschang/COOMM
 pip install -e COOMM
 ```
+
+## Examples
+
+> Note, all the example cases written uses the original version of COOMM (v.0.0.1), with older version of PyElastica (v.0.2.2). If you are interested in reproducing the result from the paper, please match the version.
+
 ## Citation
 
 We ask that any publications which use COOMM cite as following:
