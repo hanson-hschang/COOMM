@@ -3,16 +3,10 @@ Created on Sep. 23, 2021
 @author: Heng-Sheng (Hanson) Chang
 """
 
-from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
 
-import sys
-#sys.path.append("../")          # include examples directory
-#sys.path.append("../../")       # include ActuationModel directory
-
 from set_environment import Environment
-from plot_frames import Frame
 
 from coomm.algorithms import ForwardBackwardMuscle
 from coomm.objects import PointTarget
@@ -75,69 +69,6 @@ def main(filename, target_position=None):
     algo_callback = AlgorithmMuscleCallBack(step_skip=env.step_skip)
 
     algo.run(max_iter_number=100_000)
-    
-    # frame = Frame.get_frame(filename)
-    # L0 = frame.set_ref_configuration(
-    #     position=systems[0].position_collection,
-    #     shear=systems[0].sigma+np.array([0, 0, 1])[:, None],
-    #     kappa=systems[0].kappa,
-    # )
-    # frame.reset()
-
-    # ax_main = frame.plot_rod(
-    #     position=algo.static_rod.position_collection,
-    #     director=algo.static_rod.director_collection,
-    #     radius=algo.static_rod.radius,
-    #     color='orange',
-    #     alpha=0.3
-    # )
-
-    # base = systems[1].position_collection[:, 0]/L0
-    # ax_main.scatter(
-    #     base[0],
-    #     base[1],
-    #     base[2],
-    #     color='grey'
-    # )
-
-    # for i in range(3):
-    #     director_line = np.zeros((3, 2))
-    #     director_line[:, 0] = base.copy()
-    #     director_line[:, 1] = base + systems[1].director_collection[i, :, 0] * 0.1
-    #     ax_main.plot(
-    #         director_line[0], director_line[1], director_line[2],
-    #         color='grey',
-    #     )
-    
-    # base = algo.static_rod.position_collection[:, -1]/L0
-    # ax_main.scatter(
-    #     base[0],
-    #     base[1],
-    #     base[2],
-    #     color='red'
-    # )
-    # for i in range(3):
-    #     director_line = np.zeros((3, 2))
-    #     director_line[:, 0] = base.copy()
-    #     director_line[:, 1] = base + algo.static_rod.director_collection[i, :, -1] * 0.1
-    #     color = 'green' if i==0 else 'red'
-    #     ax_main.plot(
-    #         director_line[0], director_line[1], director_line[2],
-    #         color=color,
-    #     )
-
-    # frame.set_ax_main_lim(
-    #     x_lim=[-1.1, 1.1],
-    #     y_lim=[-1.1, 1.1],
-    #     z_lim=[-1.1, 1.1]
-    # )
-    
-    # frame.plot_strain(
-    #     shear=algo.static_rod.sigma+np.array([0, 0, 1])[:, None],
-    #     kappa=algo.static_rod.kappa
-    # )
-
-    # frame.show()
     
     """ Read arm params """
     activations = []

@@ -9,9 +9,7 @@ import numpy as np
 import elastica as el
 from coomm.callback_func import SphereCallBack
 
-import sys
-sys.path.append("../")          # include examples directory
-from set_arm_environment import ArmEnvironment
+from examples.set_arm_environment import ArmEnvironment
 
 class Environment(ArmEnvironment):
     

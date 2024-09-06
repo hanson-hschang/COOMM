@@ -7,13 +7,9 @@ import pickle
 from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 from matplotlib import rc
 rc('text', usetex=True)
 
-import sys
-sys.path.append("../") # include elastica-python directory
-sys.path.append("../../")       # include ActuationModel directory
 
 from coomm.frames import RodFrame, StrainFrame
 
@@ -88,10 +84,6 @@ def main(filename):
         rod_data = data['systems'][0]
         sphere_data = data['systems'][1]
         recording_fps = data['recording_fps']
-
-    with open(filename+"_systems.pickle", "rb") as f:
-        data = pickle.load(f)
-        rod = data['systems'][0]
     
     frame = Frame.get_frame(filename=filename)
 
@@ -103,7 +95,6 @@ def main(filename):
 
     print("Plotting frames ...")
     for k in tqdm(range(len(rod_data["time"]))):
-    # for k in tqdm([-1]):
 
         frame.reset()
         

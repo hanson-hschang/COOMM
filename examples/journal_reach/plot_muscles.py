@@ -7,13 +7,10 @@ import pickle
 from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib import rc
 rc('text', usetex=True)
 
-import sys
-sys.path.append("../")       # include ActuationModel directory
 
 from coomm.frames import (
     RodFrame,
@@ -306,10 +303,10 @@ def main(filename):
         algo_data = data['algo']
         recording_fps = data['recording_fps']
 
-    with open(filename+"_systems.pickle", "rb") as f:
-        data = pickle.load(f)
-        rod = data['systems'][0]
-        muscle_groups = data['muscle_groups']
+    # with open(filename+"_systems.pickle", "rb") as f:
+    #     data = pickle.load(f)
+    #     rod = data['systems'][0]
+    #     muscle_groups = data['muscle_groups']
     
     frame = Frame.get_frame(filename=filename)
 
