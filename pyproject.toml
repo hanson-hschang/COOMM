@@ -18,12 +18,16 @@ classifiers = [
 "Intended Audience :: Science/Research",
 "Intended Audience :: Education",
 ]
+packages = [
+    { include = "examples" },
+    { include = "coomm" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10,<3.11"
 numba = "^0.55.0"
 numpy = "^1.19.2"
-pyelastica = "^0.3.1.post1"
+pyelastica = "0.2.2"
 matplotlib = "^3.7.1"
 
 
