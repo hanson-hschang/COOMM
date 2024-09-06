@@ -6,8 +6,8 @@ Created on Sep. 23, 2021
 import numpy as np
 from tqdm import tqdm
 
-import sys
-sys.path.append("../")          # include examples directory
+# import sys
+# sys.path.append("../")          # include examples directory
 # sys.path.append("../../")       # include coomm directory
 
 from coomm.objects import CylinderTarget
@@ -15,7 +15,7 @@ from coomm.algorithms import ForwardBackwardMuscle
 from coomm.callback_func import AlgorithmMuscleCallBack
 
 from set_environment import Environment
-from plot_frames import Frame
+# from plot_frames import Frame
 
 def data_for_cylinder_along_z(center_x,center_y,radius,height_z):
     z = np.linspace(-height_z, height_z, 50)
@@ -80,94 +80,6 @@ def main(filename, target_position=None, target_director=None):
         target=systems[1]
     )
     algo_callback = AlgorithmMuscleCallBack(step_skip=env.step_skip)
-
-
-    # frame = Frame.get_frame(filename)
-    # L0 = frame.set_ref_configuration(
-    #     position=systems[0].position_collection,
-    #     shear=systems[0].sigma+np.array([0, 0, 1])[:, None],
-    #     kappa=systems[0].kappa,
-    # )
-    # frame.reset()
-
-    # ax_main = frame.plot_rod(
-    #     position=algo.static_rod.position_collection,
-    #     director=algo.static_rod.director_collection,
-    #     radius=algo.static_rod.radius,
-    #     color='orange',
-    #     alpha=0.1
-    # )
-
-    # base = systems[1].position_collection[:, 0]/L0
-    # ax_main.scatter(
-    #     base[0],
-    #     base[1],
-    #     base[2],
-    #     color='grey'
-    # )
-    # cylinder = systems[1]
-    # Xc,Yc,Zc = data_for_cylinder_along_z(
-    #     cylinder.position_collection[0, 0]/L0,
-    #     cylinder.position_collection[1, 0]/L0,
-    #     cylinder.radius/L0,
-    #     cylinder.length/L0/2
-    # )
-    # ax_main.plot_surface(Xc, Yc, Zc, alpha=0.5)
-
-    # n_ii = 2
-    # for ii in range(n_ii):
-    #     algo.run(max_iter_number=50_000)
-    #     frame.plot_rod(
-    #         position=algo.static_rod.position_collection,
-    #         director=algo.static_rod.director_collection,
-    #         radius=algo.static_rod.radius,
-    #         color='orange',
-    #         alpha=0.1+(ii+1)*(0.9/n_ii)
-    #     )
-
-    #     for i in range(3):
-    #         director_line = np.zeros((3, 2))
-    #         director_line[:, 0] = base.copy()
-    #         director_line[:, 1] = base + systems[1].director_collection[i, :, 0] * 0.1
-    #         ax_main.plot(
-    #             director_line[0], director_line[1], director_line[2],
-    #             color='grey',
-    #         )
-        
-    #     for n in [19, 39, 59, 79, 99]:
-    #         base = algo.static_rod.position_collection[:, n]/L0
-    #         ax_main.scatter(
-    #             base[0],
-    #             base[1],
-    #             base[2],
-    #             color='red'
-    #         )
-    #         for i in range(3):
-    #             director_line = np.zeros((3, 2))
-    #             director_line[:, 0] = base.copy()
-    #             director_line[:, 1] = base + algo.static_rod.director_collection[i, :, n] * 0.1
-    #             color = 'green' if i==0 else 'red'
-    #             ax_main.plot(
-    #                 director_line[0], director_line[1], director_line[2],
-    #                 color=color,
-    #             )
-
-    #     frame.set_ax_main_lim(
-    #         x_lim=[-1.1, 1.1],
-    #         y_lim=[-1.1, 1.1],
-    #         z_lim=[-1.1, 1.1]
-    #     )
-        
-    #     frame.plot_strain(
-    #         shear=algo.static_rod.sigma+np.array([0, 0, 1])[:, None],
-    #         kappa=algo.static_rod.kappa
-    #     )
-        
-    #     for activation in algo.activations:
-    #         print(max(activation))
-    # frame.show()
-
-    # quit()
 
     """ Run the algorithm """
     # algo.run(max_iter_number=200_000)

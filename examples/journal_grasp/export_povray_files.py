@@ -3,27 +3,22 @@ Created on Dec. 20, 2021
 @author: Heng-Sheng (Hanson) Chang
 """
 
-import sys
-sys.path.append("../../../../") # include elastica-python directory
-sys.path.append("../../")       # include ActuationModel directory
-
 import pickle
-from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
 
-from _rendering_tool import check_folder
-from povray import (
+from coomm._rendering_tool import check_folder
+from coomm.povray import (
     POVRAYFrame,
     POVRAYCamera,
 )
-from povray.rod import POVRAYRod
-from povray.muscles import (
+from coomm.povray.rod import POVRAYRod
+from coomm.povray.muscles import (
     POVRAYTransverseMuscle,
     POVRAYLongitudinalMuscle,
     POVRAYObliqueMuscle
 )
-from povray.cylinder import POVRAYCylinder
+from coomm.povray.cylinder import POVRAYCylinder
 
 
 def main(filename):
@@ -78,8 +73,6 @@ def main(filename):
 
     
     for k in tqdm(range(len(rod_data["time"]))):
-    # for k in tqdm([len(rod_data["time"])-1]):
-    # for k in tqdm([0, 250]):
         plot_flag = False
         frame_inc_name = "frame%04d.inc" % k
         frame_sucker_inc_name = "frame_sucker%04d.inc" % k

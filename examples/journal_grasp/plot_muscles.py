@@ -12,8 +12,6 @@ from matplotlib.lines import Line2D
 from matplotlib import rc
 rc('text', usetex=True)
 
-import sys
-sys.path.append("../../")       # include ActuationModel directory
 
 from coomm.frames import (
     RodFrame,
@@ -304,11 +302,6 @@ def main(filename):
         cylinder_data = data['systems'][1]
         muscle_groups_data = data['muscle_groups']
         algo_data = data['algo']
-
-    # with open(filename+"_systems.pickle", "rb") as f:
-    #     data = pickle.load(f)
-    #     rod = data['systems'][0]
-    #     muscle_groups = data['muscle_groups']
     
     frame = Frame.get_frame(filename=filename)
 

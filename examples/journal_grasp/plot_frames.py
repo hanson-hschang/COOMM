@@ -7,12 +7,8 @@ import pickle
 from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 from matplotlib import rc
 rc('text', usetex=True)
-
-import sys
-sys.path.append("../../")       # include ActuationModel directory
 
 from coomm.frames import RodFrame, StrainFrame
 
@@ -110,8 +106,6 @@ def main(filename):
 
     print("Plotting frames ...")
     for k in tqdm(range(len(rod_data["time"]))):
-    # for k in tqdm([-10,-9,-8,-7,-6,-5,-4,-3,-2,-1]):
-    # for k in tqdm([-1]):
 
         frame.reset()
         
