@@ -99,7 +99,7 @@ class ArmEnvironment:
         """ Add muscle actuation """
         def add_muscle_actuation(radius_base, arm):
 
-            muscle_groups = []
+            muscle_groups: list[MuscleGroup] = []
 
             LM_ratio_muscle_position = 0.0075/radius_base
             OM_ratio_muscle_position = 0.01125/radius_base

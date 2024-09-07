@@ -6,11 +6,11 @@ Created on Sep. 23, 2021
 import numpy as np
 from tqdm import tqdm
 
-from set_environment import Environment
-
 from coomm.algorithms import ForwardBackwardMuscle
 from coomm.objects import PointTarget
 from coomm.callback_func import AlgorithmMuscleCallBack
+
+from examples.journal_reach.set_environment import Environment
 
 def get_algo(rod, muscles, target):
     algo = ForwardBackwardMuscle(
