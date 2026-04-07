@@ -2,7 +2,7 @@
 name = "coomm"
 version = "0.1.1"
 description = "Control Oriented Muscle Model for an octopus arm."
-authors = ["hanson-hschang <hschang2@illinois.edu>", "Seung Hyun Kim <skim449@illinois.edu>"]
+authors = ["hanson-hschang <hschang@illinois.edu>", "Seung Hyun Kim <skim449@illinois.edu>"]
 license = "MIT"
 readme = "README.md"
 
@@ -15,6 +15,7 @@ classifiers = [
 "Programming Language :: Python :: 3.8",
 "Programming Language :: Python :: 3.9",
 "Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
 "Intended Audience :: Science/Research",
 "Intended Audience :: Education",
 ]
