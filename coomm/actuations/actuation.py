@@ -68,11 +68,13 @@ class ContinuousActuation:
         self.internal_couple[:, :] *= 0
         self.external_couple[:, :] *= 0
 
-class ApplyActuations(NoForces):
-    """ApplyActuations
-    """
 
-    def __init__(self, actuations, step_skip: int, callback_params_list: list):
+class ApplyActuations(NoForces):
+    """ApplyActuations"""
+
+    def __init__(
+        self, actuations, step_skip: int, callback_params_list: list | None = None
+    ):
         """
         TODO : need documentation on how to initialize
 
@@ -80,7 +82,7 @@ class ApplyActuations(NoForces):
         ----------
         actuations :
         step_skip : int
-        callback_params_list : Dictionary[list]
+        callback_params_list : Dictionary[list], Optional
         """
         self.current_step = 0
         self.actuations = actuations
@@ -104,7 +106,8 @@ class ApplyActuations(NoForces):
                 system.external_torques, actuation.external_couple
             )
 
-        self.make_callback()
+        if self.callback_params_list is not None:
+            self.make_callback()
 
     def make_callback(self):
         """make_callback.
