@@ -23,15 +23,14 @@ def _internal_to_external_load(
     rest_lengths,
     rest_voronoi_lengths,
     dilatation,
-    voronoi_dilatation,
     internal_force,
     internal_couple,
     external_force,
     external_couple,
 ):
-    external_force[:, :] = difference_kernel(_material_to_lab(director_collection, internal_force))
+    external_force[:, :] += difference_kernel(_material_to_lab(director_collection, internal_force))
 
-    external_couple[:, :] = (
+    external_couple[:, :] += (
         difference_kernel(internal_couple)
         + quadrature_kernel(_batch_cross(kappa, internal_couple) * rest_voronoi_lengths)
         + _batch_cross(_lab_to_material(director_collection, tangents * dilatation), internal_force)
