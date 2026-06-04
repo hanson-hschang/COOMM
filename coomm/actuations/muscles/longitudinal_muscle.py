@@ -19,7 +19,7 @@ class LongitudinalMuscle(MuscleForce):
         ratio_muscle_position: np.ndarray,
         rest_muscle_area: np.ndarray,
         max_muscle_stress: Union[float, np.ndarray],
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize longitudinal muscle model.
@@ -44,5 +44,5 @@ class LongitudinalMuscle(MuscleForce):
             rest_muscle_area=rest_muscle_area,
             max_muscle_stress=max_muscle_stress,
             type_name="LM",
-            **kwargs
+            **kwargs,
         )

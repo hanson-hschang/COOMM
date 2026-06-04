@@ -7,9 +7,9 @@ import numpy as np
 from coomm.objects.object import Object
 from coomm.objects.target import Target
 
+
 class Cylinder(Object):
-    """Cylinder.
-    """
+    """Cylinder."""
 
     def __init__(self, position, director, radius, length, n_elements, cost_weight):
         """__init__.
@@ -82,46 +82,53 @@ class Cylinder(Object):
         return cls(
             cylinder.position_collection[:, 0].copy(),
             cylinder.director_collection[:, :, 0].copy(),
-            n_elements, cost_weight
+            n_elements,
+            cost_weight,
         )
 
     def calculate_continuous_cost_gradient_wrt_position(self, **kwargs):
-        """calculate_continuous_cost_gradient_wrt_position.
-        """
-        position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
-        radius = kwargs['radius']
-        position_diff = position-self.position[:, None]
+        """calculate_continuous_cost_gradient_wrt_position."""
+        position = 0.5 * (kwargs["position"][:, :-1] + kwargs["position"][:, 1:])
+        radius = kwargs["radius"]
+        position_diff = position - self.position[:, None]
         vertical_dist = np.einsum("ij, i -> j", position_diff, self.director[2, :])
         horizontal_position_diff = position_diff - vertical_dist * self.director[2, :, None]
         position_dist = np.linalg.norm(horizontal_position_diff, axis=0)
-        adjust_distance_ratio = (position_dist-(radius+self.radius))/position_dist
-        adjust_distance_ratio[adjust_distance_ratio>0] = 0
-        adjust_distance_ratio[vertical_dist>self.length/2] = 0
-        adjust_distance_ratio[-vertical_dist>self.length/2] = 0
+        adjust_distance_ratio = (position_dist - (radius + self.radius)) / position_dist
+        adjust_distance_ratio[adjust_distance_ratio > 0] = 0
+        adjust_distance_ratio[vertical_dist > self.length / 2] = 0
+        adjust_distance_ratio[-vertical_dist > self.length / 2] = 0
         self.cost_gradient.continuous.wrt_position[:, :] = (
-            self.cost_weight['position'] * horizontal_position_diff * adjust_distance_ratio
+            self.cost_weight["position"] * horizontal_position_diff * adjust_distance_ratio
         )
 
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
-        """calculate_continuous_cost_gradient_wrt_director.
-        """
+        """calculate_continuous_cost_gradient_wrt_director."""
         pass
-    
+
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
-        """calculate_discrete_cost_gradient_wrt_position.
-        """
+        """calculate_discrete_cost_gradient_wrt_position."""
         pass
-    
+
     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
-        """calculate_discrete_cost_gradient_wrt_director.
-        """
+        """calculate_discrete_cost_gradient_wrt_director."""
         pass
+
 
 class CylinderTarget(Cylinder, Target):
-    """CylinderTarget.
-    """
+    """CylinderTarget."""
 
-    def __init__(self, position, director, radius, length, n_elements, cost_weight, target_cost_weight, **kwargs):
+    def __init__(
+        self,
+        position,
+        director,
+        radius,
+        length,
+        n_elements,
+        cost_weight,
+        target_cost_weight,
+        **kwargs,
+    ):
         """__init__.
 
         Parameters
@@ -136,7 +143,7 @@ class CylinderTarget(Cylinder, Target):
         """
         Cylinder.__init__(self, position, director, radius, length, n_elements, cost_weight)
         Target.__init__(self, target_cost_weight)
-        self.director_cost_flag = kwargs.get('director_cost_flag', False)
+        self.director_cost_flag = kwargs.get("director_cost_flag", False)
 
     @classmethod
     def get_cylinder(cls, cylinder, n_elements, cost_weight, target_cost_weight, **kwargs):
@@ -158,17 +165,19 @@ class CylinderTarget(Cylinder, Target):
             cylinder.director_collection[:, :, 0].copy(),
             cylinder.radius,
             cylinder.length,
-            n_elements, cost_weight, target_cost_weight, **kwargs
+            n_elements,
+            cost_weight,
+            target_cost_weight,
+            **kwargs,
         )
-    
+
     def calculate_continuous_cost_gradient_wrt_position(self, **kwargs):
-        """calculate_continuous_cost_gradient_wrt_position.
-        """
+        """calculate_continuous_cost_gradient_wrt_position."""
         Cylinder.calculate_continuous_cost_gradient_wrt_position(self, **kwargs)
-        position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
-        radius = kwargs['radius']
-        position_diff = position-self.position[:, None]
-        
+        position = 0.5 * (kwargs["position"][:, :-1] + kwargs["position"][:, 1:])
+        radius = kwargs["radius"]
+        position_diff = position - self.position[:, None]
+
         # vertical_dist = np.einsum("ij, i -> j", position_diff, self.director[2, :])
         # horizontal_position_diff = position_diff - vertical_dist * self.director[2, :, None]
         # position_dist = np.linalg.norm(horizontal_position_diff, axis=0)
@@ -179,13 +188,13 @@ class CylinderTarget(Cylinder, Target):
         # )
 
         position_dist = np.linalg.norm(position_diff, axis=0)
-        adjust_distance_ratio = (position_dist-(radius+self.radius))/position_dist
-        
-        adjust_distance_ratio[adjust_distance_ratio<0] = 0
+        adjust_distance_ratio = (position_dist - (radius + self.radius)) / position_dist
+
+        adjust_distance_ratio[adjust_distance_ratio < 0] = 0
         self.cost_gradient.continuous.wrt_position[:, :] += (
-            self.target_cost_weight['position'] * position_diff * adjust_distance_ratio
+            self.target_cost_weight["position"] * position_diff * adjust_distance_ratio
         )
-    
+
     """ The first method """
     # def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
     #     """calculate_continuous_cost_gradient_wrt_director.
@@ -203,7 +212,7 @@ class CylinderTarget(Cylinder, Target):
     #     #     self.cost_gradient.continuous.wrt_director[:, n] = (
     #     #         self.target_cost_weight['director'][n] * director[:, :, n].T @ vector[:, n]
     #     #     )
-        
+
     #     for n in range(n_elems):
     #         vector[1, n] = - np.dot(director[2, :, n], self.director[2, :])
     #         vector[2, n] = np.dot(director[1, :, n], self.director[2, :])
@@ -224,10 +233,9 @@ class CylinderTarget(Cylinder, Target):
     #             self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
     #         )
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
-        """calculate_continuous_cost_gradient_wrt_director.
-        """
-        position = 0.5*(kwargs['position'][:, :-1]+kwargs['position'][:, 1:])
-        director = kwargs['director'][:, :, :]
+        """calculate_continuous_cost_gradient_wrt_director."""
+        position = 0.5 * (kwargs["position"][:, :-1] + kwargs["position"][:, 1:])
+        director = kwargs["director"][:, :, :]
         n_elems = director.shape[2]
 
         # vector = np.zeros((3, n_elems))
@@ -240,7 +248,7 @@ class CylinderTarget(Cylinder, Target):
         #     self.cost_gradient.continuous.wrt_director[:, n] = (
         #         self.target_cost_weight['director'][n] * director[:, :, n].T @ vector[:, n]
         #     )
-        
+
         # for n in range(n_elems):
         #     vector[1, n] = - np.dot(director[2, :, n], self.director[2, :])
         #     vector[2, n] = np.dot(director[1, :, n], self.director[2, :])
@@ -249,20 +257,21 @@ class CylinderTarget(Cylinder, Target):
         #         self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
         #     )
 
-
-
         """ The second method """
         vector = np.zeros((3, n_elems))
         coefficient = np.zeros(n_elems)
         for n in range(n_elems):
             position_diff = self.position - position[:, n]
             position_diff = position_diff / np.linalg.norm(position_diff)
-            vector[1, n] = - np.dot(director[2, :, n], -position_diff)
+            vector[1, n] = -np.dot(director[2, :, n], -position_diff)
             vector[2, n] = np.dot(director[1, :, n], -position_diff)
             # coefficient[n] = 1-np.dot(director[0, :, n], position_diff)
             coefficient[n] = 1
             self.cost_gradient.continuous.wrt_director[:, n] = (
-                self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
+                self.target_cost_weight["director"][n]
+                * coefficient[n]
+                * director[:, :, n].T
+                @ vector[:, n]
             )
 
         """ The third method """
@@ -275,24 +284,22 @@ class CylinderTarget(Cylinder, Target):
         #     vector[1, n] = - np.dot(director[2, :, n], -position_diff)
         #     vector[2, n] = np.dot(director[1, :, n], -position_diff)
         #     # coefficient[n] = 1 - np.dot(director[0, :, n], position_diff)
-        #     coefficient[n] = 1 
+        #     coefficient[n] = 1
         #     # print(position_diff)
         #     self.cost_gradient.continuous.wrt_director[:, n] = (
         #         self.target_cost_weight['director'][n] * coefficient[n] * director[:, :, n].T @ vector[:, n]
         #     )
 
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
-        """calculate_discrete_cost_gradient_wrt_position.
-        """
+        """calculate_discrete_cost_gradient_wrt_position."""
         # position = 0.5*(kwargs['position'][:, -1]+kwargs['position'][:, -2])
         # self.cost_gradient.discrete.wrt_position[:, -1] = (
         #     self.target_cost_weight['position'] * (position-self.position)
         # )
         pass
-    
+
     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
-        """calculate_discrete_cost_gradient_wrt_director.
-        """
+        """calculate_discrete_cost_gradient_wrt_director."""
         # director = kwargs['director'][:, :, -1]
         # vector = np.zeros(3)
         # skew_symmetric_matrix = director @ self.director.T - self.director @ director.T

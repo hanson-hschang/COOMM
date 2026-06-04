@@ -20,7 +20,7 @@ class ObliqueMuscle(MuscleForce):
         rotation_number: float,
         rest_muscle_area: np.ndarray,
         max_muscle_stress: Union[float, np.ndarray],
-        **kwargs
+        **kwargs,
     ):
         """__init__.
 

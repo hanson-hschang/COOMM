@@ -7,9 +7,9 @@ import numpy as np
 
 from coomm.algorithms.algorithm import Algorithm
 
+
 class ForwardBackward(Algorithm):
-    """ForwardBackward.
-    """
+    """ForwardBackward."""
 
     def __init__(self, rod, algo_config, **kwargs):
         """__init__.
@@ -21,11 +21,11 @@ class ForwardBackward(Algorithm):
         """
         Algorithm.__init__(self, rod, algo_config)
         self.costate = Costate(self.static_rod.n_elements)
-        self.stepsize = self.config.get('stepsize', 1e-8)
+        self.stepsize = self.config.get("stepsize", 1e-8)
         self.iteration = 0
         self.done = False
 
-        self.objects = kwargs.get('objects', kwargs.get('object', None))
+        self.objects = kwargs.get("objects", kwargs.get("object", None))
 
     def update(self, iteration):
         """update.
@@ -34,7 +34,7 @@ class ForwardBackward(Algorithm):
         ----------
         iteration :
         """
-        return iteration+1
+        return iteration + 1
 
     def run(self, max_iter_number=100_000, **kwargs):
         """run.
@@ -53,9 +53,9 @@ class ForwardBackward(Algorithm):
         print("Finishing the algorithm at maximum iternation", self.iteration)
         return
 
+
 class Costate:
-    """Costate.
-    """
+    """Costate."""
 
     def __init__(self, n_elements):
         """__init__.
@@ -66,7 +66,7 @@ class Costate:
         """
         # material frame
         self.internal_force = np.zeros((3, n_elements))
-        self.internal_couple = np.zeros((3, n_elements-1))
+        self.internal_couple = np.zeros((3, n_elements - 1))
 
         # lab frame
         self.internal_force_discrete_jump = np.zeros((3, n_elements))

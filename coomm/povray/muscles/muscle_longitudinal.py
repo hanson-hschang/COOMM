@@ -6,6 +6,7 @@ Created on Dec. 21, 2021
 from coomm.povray import POVRAYBase
 from coomm.povray.muscles.muscle import POVRAYSlenderMuscle
 
+
 class POVRAYLongitudinalMuscle(POVRAYBase, POVRAYSlenderMuscle):
     def __init__(self, **kwargs):
         POVRAYBase.__init__(self, **kwargs)

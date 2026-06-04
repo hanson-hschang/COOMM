@@ -7,9 +7,9 @@ import numpy as np
 from coomm.objects.object import Object
 from coomm.objects.target import Target
 
+
 class Point(Object):
-    """Point.
-    """
+    """Point."""
 
     def __init__(self, position, director, n_elements, cost_weight):
         """__init__.
@@ -76,13 +76,13 @@ class Point(Object):
         return Point(
             sphere.position_collection[:, 0].copy(),
             sphere.director_collection[:, :, 0].copy(),
-            n_elements, cost_weight
+            n_elements,
+            cost_weight,
         )
 
 
 class PointTarget(Point, Target):
-    """PointTarget.
-    """
+    """PointTarget."""
 
     def __init__(self, position, director, n_elements, cost_weight, target_cost_weight, **kwargs):
         """__init__.
@@ -104,10 +104,12 @@ class PointTarget(Point, Target):
         """
         Point.__init__(self, position, director, n_elements, cost_weight)
         Target.__init__(self, target_cost_weight)
-        self.director_cost_flag = kwargs.get('director_cost_flag', False)
+        self.director_cost_flag = kwargs.get("director_cost_flag", False)
 
     @classmethod
-    def get_point_target_from_sphere(cls, sphere, n_elements, cost_weight, target_cost_weight, **kwargs):
+    def get_point_target_from_sphere(
+        cls, sphere, n_elements, cost_weight, target_cost_weight, **kwargs
+    ):
         """get_point_target_from_sphere.
 
         Parameters
@@ -126,9 +128,12 @@ class PointTarget(Point, Target):
         return PointTarget(
             sphere.position_collection[:, 0].copy(),
             sphere.director_collection[:, :, 0].copy(),
-            n_elements, cost_weight, target_cost_weight, **kwargs
+            n_elements,
+            cost_weight,
+            target_cost_weight,
+            **kwargs,
         )
-    
+
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
         """calculate_discrete_cost_gradient_wrt_position.
 
@@ -137,11 +142,11 @@ class PointTarget(Point, Target):
         kwargs :
             kwargs
         """
-        position = 0.5*(kwargs['position'][:, -1]+kwargs['position'][:, -2])
-        self.cost_gradient.discrete.wrt_position[:, -1] = (
-            self.target_cost_weight['position'] * (position-self.position)
+        position = 0.5 * (kwargs["position"][:, -1] + kwargs["position"][:, -2])
+        self.cost_gradient.discrete.wrt_position[:, -1] = self.target_cost_weight["position"] * (
+            position - self.position
         )
-    
+
     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
         """calculate_discrete_cost_gradient_wrt_director.
 
@@ -150,12 +155,12 @@ class PointTarget(Point, Target):
         kwargs :
             kwargs
         """
-        director = kwargs['director'][:, :, -1]
+        director = kwargs["director"][:, :, -1]
         vector = np.zeros(3)
         skew_symmetric_matrix = director @ self.director.T - self.director @ director.T
         vector[0] = skew_symmetric_matrix[1, 2]
         vector[1] = -skew_symmetric_matrix[0, 2]
         vector[2] = skew_symmetric_matrix[0, 1]
         self.cost_gradient.discrete.wrt_director[:, -1] = (
-            self.target_cost_weight['director'] * director.T @ vector
+            self.target_cost_weight["director"] * director.T @ vector
         )

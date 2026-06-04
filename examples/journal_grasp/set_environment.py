@@ -11,13 +11,14 @@ from coomm.callback_func import CylinderCallBack
 
 from examples.set_arm_environment import ArmEnvironment
 
+
 class Environment(ArmEnvironment):
-    
-    def get_data(self,):
+    def get_data(
+        self,
+    ):
         return [self.rod_parameters_dict, self.cylinder_parameters_dict]
 
     def setup(self):
-
         self.set_arm()
 
         """ Set up a cylinder object """
@@ -29,23 +30,21 @@ class Environment(ArmEnvironment):
             normal=np.array([1.0, 0.0, 0.0]),
             base_length=0.4,
             base_radius=0.02,
-            density=1750.0
+            density=1750.0,
         )
 
         self.simulator.append(self.cylinder)
-        
+
         self.cylinder_parameters_dict = defaultdict(list)
         self.simulator.collect_diagnostics(self.cylinder).using(
             CylinderCallBack,
             step_skip=self.step_skip,
-            callback_params=self.cylinder_parameters_dict
+            callback_params=self.cylinder_parameters_dict,
         )
 
         """ Set up boundary and contact conditions """
         self.simulator.constrain(self.cylinder).using(
-            el.OneEndFixedRod,
-            constrained_position_idx=(0,),
-            constrained_director_idx=(0,)
+            el.OneEndFixedRod, constrained_position_idx=(0,), constrained_director_idx=(0,)
         )
 
         self.simulator.connect(self.shearable_rod, self.cylinder).using(

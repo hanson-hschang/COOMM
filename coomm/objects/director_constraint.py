@@ -7,9 +7,9 @@ import numpy as np
 from coomm.objects.object import Object
 from coomm.objects.target import Target
 
+
 class DirectorConstraint(Object, Target):
-    """DirectorConstraint.
-    """
+    """DirectorConstraint."""
 
     def __init__(self, director, n_elements, cost_weight, target_cost_weight, **kwargs):
         """__init__.
@@ -30,7 +30,7 @@ class DirectorConstraint(Object, Target):
         Object.__init__(self, n_elements, cost_weight)
         Target.__init__(self, target_cost_weight)
         self.director = director.copy()
-        
+
         # self.director_flags = [True, True, True]
         # for i in range(len(self.director_flags)):
         #     if self.director[i, 0] is None:
@@ -64,7 +64,7 @@ class DirectorConstraint(Object, Target):
         # for i, director_flag in enumerate(self.director_flags):
         #     self.director[i, :] = (
         #         target_director[i, :].copy() if director_flag else director[i, :].copy()
-        #     ) 
+        #     )
         pass
 
     # @classmethod
@@ -84,7 +84,7 @@ class DirectorConstraint(Object, Target):
             kwargs
         """
         pass
-    
+
     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
         """calculate_continuous_cost_gradient_wrt_director.
 
@@ -93,25 +93,24 @@ class DirectorConstraint(Object, Target):
         kwargs :
             kwargs
         """
-        director = kwargs['director'].copy()
+        director = kwargs["director"].copy()
         vector = np.zeros((3, self.n_elements))
-        skew_symmetric_matrix = (
-            np.einsum('ijn,kjn->ikn', director, self.director) - 
-            np.einsum('ijn,kjn->ikn', self.director, director)
+        skew_symmetric_matrix = np.einsum("ijn,kjn->ikn", director, self.director) - np.einsum(
+            "ijn,kjn->ikn", self.director, director
         )
         vector[0, :] = skew_symmetric_matrix[1, 2, :]
         vector[1, :] = -skew_symmetric_matrix[0, 2, :]
         vector[2, :] = skew_symmetric_matrix[0, 1, :]
-        self.cost_gradient.discrete.wrt_director[:, :] = (
-            self.target_cost_weight['director'] * np.einsum('jik,jk->ik', director, vector)
-        )
+        self.cost_gradient.discrete.wrt_director[:, :] = self.target_cost_weight[
+            "director"
+        ] * np.einsum("jik,jk->ik", director, vector)
         # print("director")
         # print(director)
         # print("self.director")
         # print(self.director)
         # print("vector")
         # print(vector)
-    
+
     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
         """calculate_discrete_cost_gradient_wrt_position.
 
@@ -121,7 +120,7 @@ class DirectorConstraint(Object, Target):
             kwargs
         """
         pass
-    
+
     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
         """calculate_discrete_cost_gradient_wrt_director.
 
@@ -131,6 +130,7 @@ class DirectorConstraint(Object, Target):
             kwargs
         """
         pass
+
 
 # TODO: What is this? Do we want to include or remove?
 # class PointTarget(Point, Target):
@@ -146,19 +146,19 @@ class DirectorConstraint(Object, Target):
 #             sphere.director_collection[:, :, 0].copy(),
 #             n_elements, cost_weight, target_cost_weight, **kwargs
 #         )
-    
+
 #     def calculate_continuous_cost_gradient_wrt_position(self, **kwargs):
 #         pass
-    
+
 #     def calculate_continuous_cost_gradient_wrt_director(self, **kwargs):
 #         pass
-    
+
 #     def calculate_discrete_cost_gradient_wrt_position(self, **kwargs):
 #         position = 0.5*(kwargs['position'][:, -1]+kwargs['position'][:, -2])
 #         self.cost_gradient.discrete.wrt_position[:, -1] = (
 #             self.target_cost_weight['position'] * (position-self.position)
 #         )
-    
+
 #     def calculate_discrete_cost_gradient_wrt_director(self, **kwargs):
 #         director = kwargs['director'][:, :, -1]
 #         vector = np.zeros(3)

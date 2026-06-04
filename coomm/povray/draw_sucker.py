@@ -5,8 +5,7 @@ time_wave = np.sin(np.linspace(0, 100000, 1000000)) * 0.0
 
 
 def draw_sucker(time_step, povray_data_folder, position, director, radius):
-    with open(povray_data_folder + '/frame_sucker%04d.inc' % time_step, 'w') as file_inc:
-
+    with open(povray_data_folder + "/frame_sucker%04d.inc" % time_step, "w") as file_inc:
         string = ""
 
         # import matplotlib.pyplot as plt
@@ -15,11 +14,11 @@ def draw_sucker(time_step, povray_data_folder, position, director, radius):
         # ax.plot(position[0, :], position[1, :], position[2, :], 'k:')
         XX_list = []
 
-        for j in [1,-1]:
+        for j in [1, -1]:
             XX_side = []
-            for k in [10,20,30, 40,50, 60,65,70,75, 80,85,90,92,94,96,98]:
-                Y = 0.5*radius[k] * np.sin(np.linspace(0, 380, 10) / 180 * np.pi)
-                Z = 0.5*radius[k] * np.cos(np.linspace(0, 380, 10) / 180 * np.pi)
+            for k in [10, 20, 30, 40, 50, 60, 65, 70, 75, 80, 85, 90, 92, 94, 96, 98]:
+                Y = 0.5 * radius[k] * np.sin(np.linspace(0, 380, 10) / 180 * np.pi)
+                Z = 0.5 * radius[k] * np.cos(np.linspace(0, 380, 10) / 180 * np.pi)
                 X = np.zeros_like(Y)
                 circle = [X, Z, Y]
                 # ax.plot(circle[0], circle[1], circle[2], 'g')
@@ -52,8 +51,8 @@ def draw_sucker(time_step, povray_data_folder, position, director, radius):
         # exit()
         print(np.array(XX_list).shape)
         # exit()
-        for j in [0,1]:
-            sucker_radius = np.linspace(0.003, 0.0005,len(XX_list[j]))
+        for j in [0, 1]:
+            sucker_radius = np.linspace(0.003, 0.0005, len(XX_list[j]))
             for body_part_index in range(len(XX_list[j])):
                 body_part = XX_list[j][body_part_index]
                 n_elem = len(body_part)
@@ -62,18 +61,18 @@ def draw_sucker(time_step, povray_data_folder, position, director, radius):
                 for n in range(n_elem):
                     elem = body_part[n]
                     fake_shift = time_wave[time_step] * n / n_elem * 0.025
-                    string += (",\n\t<%f,%f,%f>,%f" % (elem[0] ,#+ fake_shift * np.sin(time_step / 100),
-                                                       elem[1] ,#+ fake_shift * np.cos(time_step / 100),
-                                                       elem[2] ,#+ fake_shift * np.sin(time_step / 100) * np.cos(n),
-                                                       sucker_radius[body_part_index]))
+                    string += ",\n\t<%f,%f,%f>,%f" % (
+                        elem[0],  # + fake_shift * np.sin(time_step / 100),
+                        elem[1],  # + fake_shift * np.cos(time_step / 100),
+                        elem[2],  # + fake_shift * np.sin(time_step / 100) * np.cos(n),
+                        sucker_radius[body_part_index],
+                    )
                 string += "\n\ttexture{\n"
-                string += "\t\tpigment{ color Yellow transmit %f }\n" % 0.0 #rgb < 0.45, 0.39, 1 >
+                string += "\t\tpigment{ color Yellow transmit %f }\n" % 0.0  # rgb < 0.45, 0.39, 1 >
                 string += "\t\tfinish{ phong 1 }\n\t}\n"
                 string += "\tscale<16,16,16>\n}\n"
 
-        file_inc.writelines(
-            string
-        )
+        file_inc.writelines(string)
 
 
 def rotation_matrix(axis, theta):
@@ -87,12 +86,16 @@ def rotation_matrix(axis, theta):
     b, c, d = -axis * math.sin(theta / 2.0)
     aa, bb, cc, dd = a * a, b * b, c * c, d * d
     bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-    return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
-                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
-                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
+    return np.array(
+        [
+            [aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
+            [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
+            [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc],
+        ]
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # fig = plt.figure()
@@ -130,8 +133,8 @@ if __name__ == '__main__':
     radius = np.load("radius.npy")
     print(radius)
     fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    ax.plot(position[0, :], position[1, :], position[2, :], 'k:')
+    ax = fig.add_subplot(projection="3d")
+    ax.plot(position[0, :], position[1, :], position[2, :], "k:")
     XX_list = []
     for j in [1, -1]:
         for k in [20]:
@@ -139,26 +142,32 @@ if __name__ == '__main__':
             Z = 0.01 * np.cos(np.linspace(0, 360, 10) / 180 * np.pi)
             X = np.zeros_like(Y)
             circle = [X, Z, Y]
-            ax.plot(circle[0], circle[1], circle[2], 'g')
+            ax.plot(circle[0], circle[1], circle[2], "g")
             a = np.dot(director[:, :, k].T, circle)
 
             ah = (20 * j) / 180 * np.pi
             Vh = director[2, :, k]
             surface_direction = director[0, :, k] * radius[k] * 10
-            ax.plot([position[0, k], position[0, k] + 0.01 * surface_direction[0]],
-                    [position[1, k], position[1, k] + 0.01 * surface_direction[1]],
-                    [position[2, k], position[2, k] + 0.01 * surface_direction[2]], 'r')
-            ax.plot([position[0, k], position[0, k] + 0.01 * Vh[0]],
-                    [position[1, k], position[1, k] + 0.01 * Vh[1]],
-                    [position[2, k], position[2, k] + 0.01 * Vh[2]], 'b')
+            ax.plot(
+                [position[0, k], position[0, k] + 0.01 * surface_direction[0]],
+                [position[1, k], position[1, k] + 0.01 * surface_direction[1]],
+                [position[2, k], position[2, k] + 0.01 * surface_direction[2]],
+                "r",
+            )
+            ax.plot(
+                [position[0, k], position[0, k] + 0.01 * Vh[0]],
+                [position[1, k], position[1, k] + 0.01 * Vh[1]],
+                [position[2, k], position[2, k] + 0.01 * Vh[2]],
+                "b",
+            )
 
             R = rotation_matrix(Vh, ah)
             XX = np.dot(R, surface_direction)
             XX = XX + position[:, k]
-            ax.plot(XX[0], XX[1], XX[2], 'ro')
+            ax.plot(XX[0], XX[1], XX[2], "ro")
             XX_circle = XX[:, np.newaxis] + np.dot(R, a)
 
-            ax.plot(XX_circle[0], XX_circle[1], XX_circle[2], 'go')
+            ax.plot(XX_circle[0], XX_circle[1], XX_circle[2], "go")
             XX_list.append(XX)
         data = np.array(XX_list)
         # ax.plot(data[:, 0], data[:, 1], data[:, 2])
