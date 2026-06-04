@@ -96,14 +96,24 @@ class Muscle(MuscleInfo, ContinuousActuation):
         )
 
         self.s = np.linspace(0, 1, self.n_elements + 1)
-        self.muscle_normalized_length = np.zeros(self.n_elements)
-        self.muscle_rest_length = np.ones(self.n_elements)
-        self.muscle_length = np.zeros(self.n_elements)
-        self.muscle_tangent = np.zeros((3, self.n_elements))
-        self.muscle_strain = np.zeros((3, self.n_elements))
-        self.muscle_position = np.zeros((3, self.n_elements))
-        self.ratio_muscle_position = ratio_muscle_position.copy()
-        self.rest_muscle_area = rest_muscle_area.copy()
+        n = self.n_elements
+        # Contiguous layout (22, n): normalized_length, rest_length, length,
+        # tangent[3], strain[3], position[3], ratio_position[3], rest_area,
+        # internal_force[3], internal_couple[3] (last column unused).
+        self._muscle_state = np.zeros((22, n))
+        self._muscle_state[1] = 1.0
+        self._muscle_state[12:15] = ratio_muscle_position
+        self._muscle_state[15] = rest_muscle_area
+        self.muscle_normalized_length = self._muscle_state[0]
+        self.muscle_rest_length = self._muscle_state[1]
+        self.muscle_length = self._muscle_state[2]
+        self.muscle_tangent = self._muscle_state[3:6]
+        self.muscle_strain = self._muscle_state[6:9]
+        self.muscle_position = self._muscle_state[9:12]
+        self.ratio_muscle_position = self._muscle_state[12:15]
+        self.rest_muscle_area = self._muscle_state[15]
+        self.internal_force = self._muscle_state[16:19]
+        self.internal_couple = self._muscle_state[19:22, :-1]
 
     def __call__(self, system: elastica.rod.RodBase) -> None:
         """__call__.
@@ -240,6 +250,7 @@ class MuscleForce(Muscle):
             self.muscle_normalized_length,
             self.muscle_rest_length,
             self.muscle_force,
+            self.muscle_strain,
             self.activation,
             self.max_muscle_stress,
             self.force_length_weight(self.muscle_normalized_length),
@@ -257,7 +268,52 @@ class MuscleForce(Muscle):
             system.rest_lengths,
             system.rest_voronoi_lengths,
             system.dilatation,
+        )
+
+    def forward(self, system: elastica.rod.RodBase):
+        """forward.
+
+        Directly update the rod (system) load using
+        muscle strain and geometry.
+
+        Parameters
+        ----------
+        system : elastica.rod.RodBase
+        """
+        _nb_update_muscle_strain_and_geometry(
+            system.radius,
+            self.ratio_muscle_position,
+            system.sigma,
+            system.kappa,
+            system.rest_voronoi_lengths,
             system.voronoi_dilatation,
+            self.muscle_position,
+            self.muscle_strain,
+            self.muscle_tangent,
+        )
+        _nb_calculate_muscle_actuation(
+            self.muscle_length,
+            self.muscle_normalized_length,
+            self.muscle_rest_length,
+            self.muscle_force,
+            self.muscle_strain,
+            self.activation,
+            self.max_muscle_stress,
+            self.force_length_weight(self.muscle_normalized_length),
+            self.rest_muscle_area,
+            system.dilatation,
+            self.muscle_tangent,
+            self.muscle_position,
+            self.internal_force,
+            self.internal_couple,
+            system.external_forces,  # Directly forward and modify the system loads
+            system.external_torques,
+            system.director_collection,
+            system.kappa,
+            system.tangents,
+            system.rest_lengths,
+            system.rest_voronoi_lengths,
+            system.dilatation,
         )
 
 
@@ -267,6 +323,7 @@ def _nb_calculate_muscle_actuation(
     muscle_normalized_length,
     muscle_rest_length,
     muscle_force,
+    muscle_strain,
     muscle_activation,
     max_muscle_stress,
     weight,
@@ -284,9 +341,14 @@ def _nb_calculate_muscle_actuation(
     rest_lengths,
     rest_voronoi_lengths,
     dilatation_field,
-    voronoi_dilatation,
 ):
-    # calculate_muscle_length (assuming it is already handled outside, since wasn't implemented here)
+    # calculate_muscle_length
+    blocksize = muscle_length.shape[0]
+    for i in range(blocksize):
+        muscle_length[i] = np.sqrt(
+            muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
+        )
+
     # calculate_muscle_normalized_length
     muscle_normalized_length[:] = muscle_length / muscle_rest_length
 
@@ -305,7 +367,6 @@ def _nb_calculate_muscle_actuation(
         rest_lengths,
         rest_voronoi_lengths,
         dilatation_field,
-        voronoi_dilatation,
         internal_force,
         internal_couple,
         external_force,
