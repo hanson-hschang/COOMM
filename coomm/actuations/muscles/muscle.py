@@ -104,7 +104,6 @@ class Muscle(MuscleInfo, ContinuousActuation):
         self.muscle_position = np.zeros((3, self.n_elements))
         self.ratio_muscle_position = ratio_muscle_position.copy()
         self.rest_muscle_area = rest_muscle_area.copy()
-        self.muscle_area = self.rest_muscle_area.copy()
 
     def __call__(self, system: elastica.rod.RodBase) -> None:
         """__call__.
@@ -114,19 +113,17 @@ class Muscle(MuscleInfo, ContinuousActuation):
         system : elastica.rod.RodBase
         """
 
-        self.calculate_muscle_area(self.rest_muscle_area, self.muscle_area, system.dilatation)
-        self.calculate_muscle_position(
-            self.muscle_position, system.radius, self.ratio_muscle_position
-        )
-        self.calculate_muscle_strain(
-            self.muscle_strain,
-            self.muscle_position,
+        _nb_update_muscle_strain_and_geometry(
+            system.radius,
+            self.ratio_muscle_position,
             system.sigma,
             system.kappa,
             system.rest_voronoi_lengths,
             system.voronoi_dilatation,
+            self.muscle_position,
+            self.muscle_strain,
+            self.muscle_tangent,
         )
-        self.calculate_muscle_tangent(self.muscle_tangent, self.muscle_strain)
 
     def set_current_length_as_rest_length(self, system: elastica.rod.RodBase) -> None:
         """set_current_length_as_rest_length.
@@ -137,44 +134,7 @@ class Muscle(MuscleInfo, ContinuousActuation):
         """
         self.__call__(system)
         self.calculate_muscle_length(self.muscle_length, self.muscle_strain)
-        self.muscle_rest_length[:] = self.muscle_length
-
-    @staticmethod
-    @njit(cache=True)
-    def calculate_muscle_area(rest_muscle_area, muscle_area, dilatation):
-        muscle_area[:] = rest_muscle_area / dilatation
-
-    @staticmethod
-    @njit(cache=True)
-    def calculate_muscle_position(muscle_position, radius, ratio_muscle_position):
-        muscle_position[:, :] = radius * ratio_muscle_position
-
-    @staticmethod
-    @njit(cache=True)
-    def calculate_muscle_strain(
-        muscle_strain,
-        off_center_displacement,
-        sigma,
-        kappa,
-        rest_voronoi_lengths,
-        voronoi_dilatation,
-    ):
-        shear = sigma_to_shear(sigma)
-        muscle_position_derivative = difference2D(off_center_displacement) / (
-            rest_voronoi_lengths * voronoi_dilatation
-        )
-        muscle_strain[:, :] = shear + quadrature_kernel(
-            _batch_cross(kappa, average2D(off_center_displacement)) + muscle_position_derivative
-        )
-
-    @staticmethod
-    @njit(cache=True)
-    def calculate_muscle_tangent(muscle_tangent, muscle_strain):
-        blocksize = muscle_strain.shape[1]
-        for i in range(blocksize):
-            muscle_tangent[:, i] = muscle_strain[:, i] / np.sqrt(
-                muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
-            )
+        self.muscle_rest_length[:] = self.muscle_length  # ???
 
     @staticmethod
     @njit(cache=True)
@@ -185,12 +145,35 @@ class Muscle(MuscleInfo, ContinuousActuation):
                 muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
             )
 
-    @staticmethod
-    @njit(cache=True)
-    def calculate_muscle_normalized_length(
-        muscle_normalized_length, muscle_length, muscle_rest_length
-    ):
-        muscle_normalized_length[:] = muscle_length / muscle_rest_length
+
+@njit(cache=True)
+def _nb_update_muscle_strain_and_geometry(
+    rod_radius,
+    ratio_muscle_position,
+    rod_sigma,
+    rod_kappa,
+    rod_rest_voronoi_lengths,
+    rod_voronoi_dilatation,
+    muscle_position,
+    muscle_strain,
+    muscle_tangent,
+):
+    muscle_position[:, :] = rod_radius * ratio_muscle_position
+
+    # update muscle strain
+    shear = sigma_to_shear(rod_sigma)
+    muscle_position_derivative = difference2D(muscle_position) / (
+        rod_rest_voronoi_lengths * rod_voronoi_dilatation
+    )
+
+    muscle_strain[:, :] = shear + quadrature_kernel(
+        _batch_cross(rod_kappa, average2D(muscle_position)) + muscle_position_derivative
+    )
+    blocksize = muscle_strain.shape[1]
+    for i in range(blocksize):
+        muscle_tangent[:, i] = muscle_strain[:, i] / np.sqrt(
+            muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
+        )
 
 
 class MuscleForce(Muscle):
@@ -233,6 +216,17 @@ class MuscleForce(Muscle):
         self.s_force = 0.5 * (self.s[:-1] + self.s[1:])
         self.force_length_weight = kwargs.get("force_length_weight", np.ones_like)
 
+    def apply_activation(self, activation: Union[float, np.ndarray]):
+        """apply_activation.
+
+        Parameters
+        ----------
+        activation : Union[float, np.ndarray]
+            If array of activation is given, the shape of activation is expected to
+            match the shape of muscle_activation.
+        """
+        self.activation[:] = activation
+
     def __call__(self, system: elastica.rod.RodBase):
         """__call__.
 
@@ -241,19 +235,16 @@ class MuscleForce(Muscle):
         system : elastica.rod.RodBase
         """
         super().__call__(system)
-        self.calculate_muscle_length(self.muscle_length, self.muscle_strain)
-        self.calculate_muscle_normalized_length(
-            self.muscle_normalized_length, self.muscle_length, self.muscle_rest_length
-        )
-        self.calculate_muscle_force(
+        _nb_calculate_muscle_actuation(
+            self.muscle_length,
+            self.muscle_normalized_length,
+            self.muscle_rest_length,
             self.muscle_force,
-            self.get_activation(),
+            self.activation,
             self.max_muscle_stress,
             self.force_length_weight(self.muscle_normalized_length),
-            self.muscle_area,
-        )
-        self.calculate_force_and_couple(
-            self.muscle_force,
+            self.rest_muscle_area,
+            system.dilatation,
             self.muscle_tangent,
             self.muscle_position,
             self.internal_force,
@@ -269,72 +260,57 @@ class MuscleForce(Muscle):
             system.voronoi_dilatation,
         )
 
-    @staticmethod
-    @njit(cache=True)
-    def calculate_muscle_force(
-        muscle_force, muscle_activation, max_muscle_stress, weight, muscle_area
-    ):
-        muscle_force[:] = (muscle_activation * max_muscle_stress * weight) * muscle_area
 
-    @staticmethod
-    @njit(cache=True)
-    def calculate_force_and_couple(
-        muscle_force,
-        muscle_tangent,
-        muscle_position,
-        internal_force,
-        internal_couple,
-        external_force,
-        external_couple,
+@njit(cache=True)
+def _nb_calculate_muscle_actuation(
+    muscle_length,
+    muscle_normalized_length,
+    muscle_rest_length,
+    muscle_force,
+    muscle_activation,
+    max_muscle_stress,
+    weight,
+    rest_muscle_area,
+    dilatation,
+    muscle_tangent,
+    muscle_position,
+    internal_force,
+    internal_couple,
+    external_force,
+    external_couple,
+    director_collection,
+    kappa,
+    tangents,
+    rest_lengths,
+    rest_voronoi_lengths,
+    dilatation_field,
+    voronoi_dilatation,
+):
+    # calculate_muscle_length (assuming it is already handled outside, since wasn't implemented here)
+    # calculate_muscle_normalized_length
+    muscle_normalized_length[:] = muscle_length / muscle_rest_length
+
+    # calculate_muscle_force
+    muscle_force[:] = (
+        (muscle_activation * max_muscle_stress * weight) * rest_muscle_area / dilatation
+    )
+
+    # calculate_force_and_couple
+    internal_force[:, :] = muscle_force * muscle_tangent
+    _force_induced_couple(internal_force, muscle_position, internal_couple)
+    _internal_to_external_load(
         director_collection,
         kappa,
         tangents,
         rest_lengths,
         rest_voronoi_lengths,
-        dilatation,
+        dilatation_field,
         voronoi_dilatation,
-    ):
-        internal_force[:, :] = muscle_force * muscle_tangent
-        _force_induced_couple(internal_force, muscle_position, internal_couple)
-        _internal_to_external_load(
-            director_collection,
-            kappa,
-            tangents,
-            rest_lengths,
-            rest_voronoi_lengths,
-            dilatation,
-            voronoi_dilatation,
-            internal_force,
-            internal_couple,
-            external_force,
-            external_couple,
-        )
-
-    def apply_activation(self, activation: Union[float, np.ndarray]):
-        """apply_activation.
-
-        Parameters
-        ----------
-        activation : Union[float, np.ndarray]
-            If array of activation is given, the shape of activation is expected to
-            match the shape of muscle_activation.
-        """
-        self.set_activation(self.activation, activation)
-
-    @staticmethod
-    @njit(cache=True)
-    def set_activation(muscle_activation, activation):
-        muscle_activation[:] = activation
-
-    def get_activation(self) -> Union[float, np.ndarray]:
-        """
-        activation getter
-
-        Returns
-        -------
-        activation: Union[float, np.ndarray]
-        """
-        return self.activation
+        internal_force,
+        internal_couple,
+        external_force,
+        external_couple,
+    )
 
 
 class MuscleGroup(MuscleInfo, ContinuousActuation):
@@ -401,24 +377,9 @@ class MuscleGroup(MuscleInfo, ContinuousActuation):
             If array of activation is given, the shape of activation is expected to
             match the shape of muscle_activation.
         """
-        self.set_activation(self.activation, activation)
+        self.activation[:] = activation
         for muscle in self.muscles:
-            muscle.set_activation(muscle.activation, self.activation)
-
-    @staticmethod
-    @njit(cache=True)
-    def set_activation(muscle_activation, activation):
-        muscle_activation[:] = activation
-
-    def get_activation(self) -> Union[float, np.ndarray]:
-        """
-        activation getter
-
-        Returns
-        -------
-        activation: Union[float, np.ndarray]
-        """
-        return self.activation
+            muscle.apply_activation(activation)
 
 
 class ApplyMuscles(ApplyActuations):
