@@ -133,6 +133,7 @@ class Muscle(MuscleInfo, ContinuousActuation):
             self.muscle_position,
             self.muscle_strain,
             self.muscle_tangent,
+            self.muscle_length,
         )
 
     def set_current_length_as_rest_length(self, system: elastica.rod.RodBase) -> None:
@@ -143,17 +144,7 @@ class Muscle(MuscleInfo, ContinuousActuation):
         system : elastica.rod.RodBase
         """
         self.__call__(system)
-        self.calculate_muscle_length(self.muscle_length, self.muscle_strain)
         self.muscle_rest_length[:] = self.muscle_length  # ???
-
-    @staticmethod
-    @njit(cache=True)
-    def calculate_muscle_length(muscle_length, muscle_strain):
-        blocksize = muscle_length.shape[0]
-        for i in range(blocksize):
-            muscle_length[i] = np.sqrt(
-                muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
-            )
 
 
 @njit(cache=True)
@@ -167,6 +158,7 @@ def _nb_update_muscle_strain_and_geometry(
     muscle_position,
     muscle_strain,
     muscle_tangent,
+    muscle_length,
 ):
     muscle_position[:, :] = rod_radius * ratio_muscle_position
 
@@ -181,9 +173,10 @@ def _nb_update_muscle_strain_and_geometry(
     )
     blocksize = muscle_strain.shape[1]
     for i in range(blocksize):
-        muscle_tangent[:, i] = muscle_strain[:, i] / np.sqrt(
+        muscle_length[i] = np.sqrt(
             muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
         )
+        muscle_tangent[:, i] = muscle_strain[:, i] / muscle_length[i]
 
 
 class MuscleForce(Muscle):
@@ -246,11 +239,10 @@ class MuscleForce(Muscle):
         """
         super().__call__(system)
         _nb_calculate_muscle_actuation(
-            self.muscle_length,
-            self.muscle_normalized_length,
-            self.muscle_rest_length,
+            # self.muscle_length,
+            # self.muscle_normalized_length,
+            # self.muscle_rest_length,
             self.muscle_force,
-            self.muscle_strain,
             self.activation,
             self.max_muscle_stress,
             self.force_length_weight(self.muscle_normalized_length),
@@ -280,7 +272,7 @@ class MuscleForce(Muscle):
         ----------
         system : elastica.rod.RodBase
         """
-        _nb_update_muscle_strain_and_geometry(
+        _nb_update_muscle_strain_and_geometry_simplified(
             system.radius,
             self.ratio_muscle_position,
             system.sigma,
@@ -290,13 +282,13 @@ class MuscleForce(Muscle):
             self.muscle_position,
             self.muscle_strain,
             self.muscle_tangent,
+            self.muscle_length,
         )
         _nb_calculate_muscle_actuation(
-            self.muscle_length,
-            self.muscle_normalized_length,
-            self.muscle_rest_length,
+            # self.muscle_length,
+            # self.muscle_normalized_length,
+            # self.muscle_rest_length,
             self.muscle_force,
-            self.muscle_strain,
             self.activation,
             self.max_muscle_stress,
             self.force_length_weight(self.muscle_normalized_length),
@@ -318,12 +310,46 @@ class MuscleForce(Muscle):
 
 
 @njit(cache=True)
-def _nb_calculate_muscle_actuation(
-    muscle_length,
-    muscle_normalized_length,
-    muscle_rest_length,
-    muscle_force,
+def _nb_update_muscle_strain_and_geometry_simplified(
+    rod_radius,
+    ratio_muscle_position,
+    rod_sigma,
+    rod_kappa,
+    rod_rest_voronoi_lengths,
+    rod_voronoi_dilatation,
+    muscle_position,
     muscle_strain,
+    muscle_tangent,
+    muscle_length,
+):
+    muscle_position[:, :] = rod_radius * ratio_muscle_position
+
+    # update muscle strain
+    muscle_position_derivative = difference2D(muscle_position) / (
+        rod_rest_voronoi_lengths * rod_voronoi_dilatation
+    )
+
+    muscle_strain[:, :] = (
+        quadrature_kernel(
+            _batch_cross(rod_kappa, average2D(muscle_position)) + muscle_position_derivative
+        )
+        + rod_sigma
+    )
+    muscle_strain[2, :] += 1
+    blocksize = muscle_strain.shape[1]
+    for i in range(blocksize):
+        muscle_length[i] = np.sqrt(
+            muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
+        )
+        muscle_tangent[:, i] = muscle_strain[:, i] / muscle_length[i]
+
+
+@njit(cache=True)
+def _nb_calculate_muscle_actuation(
+    # muscle_length,
+    # muscle_normalized_length,
+    # muscle_rest_length,
+    muscle_force,
     muscle_activation,
     max_muscle_stress,
     weight,
@@ -342,15 +368,8 @@ def _nb_calculate_muscle_actuation(
     rest_voronoi_lengths,
     dilatation_field,
 ):
-    # calculate_muscle_length
-    blocksize = muscle_length.shape[0]
-    for i in range(blocksize):
-        muscle_length[i] = np.sqrt(
-            muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
-        )
-
     # calculate_muscle_normalized_length
-    muscle_normalized_length[:] = muscle_length / muscle_rest_length
+    # muscle_normalized_length[:] = muscle_length / muscle_rest_length
 
     # calculate_muscle_force
     muscle_force[:] = (
