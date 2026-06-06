@@ -179,9 +179,6 @@ class BatchMuscle(MuscleInfo):
         self.s = np.linspace(0.0, 1.0, self.num_elements + 1)
         self.s_activation = 0.5 * (self.s[:-1] + self.s[1:])
 
-        self.ratio_muscle_position = np.stack(self._ratio_positions, axis=0)
-        self.rest_muscle_area = np.stack(self._rest_areas, axis=0)
-
         self.max_muscle_stress = np.zeros((self.n_muscles, self.num_elements))
         for m, stress in enumerate(self._max_stresses):
             self.max_muscle_stress[m, :] = stress
@@ -194,8 +191,8 @@ class BatchMuscle(MuscleInfo):
         self._muscle_state = self._block.reshape(self.n_muscles, 23, n)
 
         self._muscle_state[:, 1, :] = 1.0
-        self._muscle_state[:, 12:15, :] = self.ratio_muscle_position
-        self._muscle_state[:, 15, :] = self.rest_muscle_area
+        self._muscle_state[:, 12:15, :] = np.stack(self._ratio_positions, axis=0)
+        self._muscle_state[:, 15, :] = np.stack(self._rest_areas, axis=0)
 
         self.muscle_normalized_length = self._muscle_state[:, 0, :]
         self.muscle_rest_length = self._muscle_state[:, 1, :]
@@ -318,7 +315,7 @@ def _nb_batch_update_muscle_strain_and_geometry(
         )
         muscle_strain[m, 2, :] += 1.0
 
-        if m == 0:
+        if m == 0:  # FIXME: Probably better way to handle this.
             _nb_transverse_muscle_length(muscle_length[m], muscle_strain[m])
         else:
             _nb_muscle_length(muscle_length[m], muscle_strain[m])
@@ -402,9 +399,6 @@ def _nb_transverse_muscle_length(muscle_length: np.ndarray, muscle_strain: np.nd
     blocksize = muscle_length.shape[0]
     for i in range(blocksize):
         # fmt: off
-        muscle_length[i] = (
-            1 / (muscle_strain[0, i] ** 2 +  \
-                    muscle_strain[1, i] ** 2 +  \
-                    muscle_strain[2, i] ** 2) ** 0.25 \
-        )
+        denom = muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
+        muscle_length[i] = 1 / denom ** 0.25
         # fmt: on

@@ -423,6 +423,7 @@ class MuscleGroup(MuscleInfo, ContinuousActuation):
         """
         self.reset_actuation()
         for muscle in self.muscles:
+            muscle.reset_actuation()
             muscle(system)
             inplace_addition(self.internal_force, muscle.internal_force)
             inplace_addition(self.external_force, muscle.external_force)
