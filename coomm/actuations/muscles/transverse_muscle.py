@@ -14,7 +14,10 @@ class TransverseMuscle(MuscleForce):
     """TransverseMuscle."""
 
     def __init__(
-        self, rest_muscle_area: np.ndarray, max_muscle_stress: Union[float, np.ndarray], **kwargs
+        self,
+        rest_muscle_area: np.ndarray,
+        max_muscle_stress: Union[float, np.ndarray],
+        **kwargs,
     ):
         """__init__.
 

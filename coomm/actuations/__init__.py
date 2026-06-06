@@ -4,3 +4,4 @@ Created on Sep. 23, 2021
 """
 
 from .actuation import *
+from .batch_muscle import ApplyMuscleActuations, BatchMuscle

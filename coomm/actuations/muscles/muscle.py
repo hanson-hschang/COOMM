@@ -134,6 +134,8 @@ class Muscle(MuscleInfo, ContinuousActuation):
             self.muscle_strain,
             self.muscle_tangent,
             self.muscle_length,
+            self.muscle_normalized_length,
+            self.muscle_rest_length,
         )
 
     def set_current_length_as_rest_length(self, system: elastica.rod.RodBase) -> None:
@@ -159,6 +161,8 @@ def _nb_update_muscle_strain_and_geometry(
     muscle_strain,
     muscle_tangent,
     muscle_length,
+    muscle_normalized_length,
+    muscle_rest_length,
 ):
     muscle_position[:, :] = rod_radius * ratio_muscle_position
 
@@ -177,6 +181,7 @@ def _nb_update_muscle_strain_and_geometry(
             muscle_strain[0, i] ** 2 + muscle_strain[1, i] ** 2 + muscle_strain[2, i] ** 2
         )
         muscle_tangent[:, i] = muscle_strain[:, i] / muscle_length[i]
+        muscle_normalized_length[i] = muscle_length[i] / muscle_rest_length[i]
 
 
 class MuscleForce(Muscle):
@@ -239,9 +244,6 @@ class MuscleForce(Muscle):
         """
         super().__call__(system)
         _nb_calculate_muscle_actuation(
-            # self.muscle_length,
-            # self.muscle_normalized_length,
-            # self.muscle_rest_length,
             self.muscle_force,
             self.activation,
             self.max_muscle_stress,
@@ -285,9 +287,6 @@ class MuscleForce(Muscle):
             self.muscle_length,
         )
         _nb_calculate_muscle_actuation(
-            # self.muscle_length,
-            # self.muscle_normalized_length,
-            # self.muscle_rest_length,
             self.muscle_force,
             self.activation,
             self.max_muscle_stress,
@@ -346,9 +345,6 @@ def _nb_update_muscle_strain_and_geometry_simplified(
 
 @njit(cache=True)
 def _nb_calculate_muscle_actuation(
-    # muscle_length,
-    # muscle_normalized_length,
-    # muscle_rest_length,
     muscle_force,
     muscle_activation,
     max_muscle_stress,
@@ -368,9 +364,6 @@ def _nb_calculate_muscle_actuation(
     rest_voronoi_lengths,
     dilatation_field,
 ):
-    # calculate_muscle_normalized_length
-    # muscle_normalized_length[:] = muscle_length / muscle_rest_length
-
     # calculate_muscle_force
     muscle_force[:] = (
         (muscle_activation * max_muscle_stress * weight) * rest_muscle_area / dilatation
