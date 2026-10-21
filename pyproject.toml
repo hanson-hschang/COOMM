@@ -1,37 +1,38 @@
-[tool.poetry]
+[project]
 name = "coomm"
 version = "0.1.1"
 description = "Control Oriented Muscle Model for an octopus arm."
-authors = ["hanson-hschang <hschang@illinois.edu>", "Seung Hyun Kim <skim449@illinois.edu>"]
-license = "MIT"
 readme = "README.md"
-
+license = "MIT"
+authors = [
+    { name = "hanson-hschang", email = "hschang@illinois.edu" },
+    { name = "Seung Hyun Kim", email = "skim449@illinois.edu" },
+]
+requires-python = ">=3.10"
 classifiers = [
-# Trove classifiers
-# Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-"License :: OSI Approved :: MIT License",
-"Development Status :: 4 - Beta",
-"Programming Language :: Python",
-"Programming Language :: Python :: 3.8",
-"Programming Language :: Python :: 3.9",
-"Programming Language :: Python :: 3.10",
-"Programming Language :: Python :: 3.11",
-"Programming Language :: Python :: 3.12",
-"Intended Audience :: Science/Research",
-"Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
 ]
-packages = [
-    { include = "examples" },
-    { include = "coomm" },
+dependencies = [
+    "matplotlib>=3.7.1,<4",
+    "numpy>=1.19.2,<2",
+    "pyelastica>=1.0.0,<2",
 ]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-numpy = "^1.19.2"
-pyelastica = "^1.0.0"
-matplotlib = "^3.7.1"
-
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["coomm"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"examples" = "examples"
