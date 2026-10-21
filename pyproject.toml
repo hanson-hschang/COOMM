@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
     "matplotlib>=3.7.1,<4",
-    "numpy>=1.19.2,<2",
+    "numpy>=1.23.5,<2.5",
     "pyelastica>=1.0.0,<2",
 ]
 
