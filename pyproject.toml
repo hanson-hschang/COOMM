@@ -16,6 +16,7 @@ classifiers = [
 "Programming Language :: Python :: 3.9",
 "Programming Language :: Python :: 3.10",
 "Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12",
 "Intended Audience :: Science/Research",
 "Intended Audience :: Education",
 ]
@@ -26,9 +27,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-numba = "^0.55.0"
 numpy = "^1.19.2"
-pyelastica = "0.2.2"
+pyelastica = "^1.0.0"
 matplotlib = "^3.7.1"
 
 

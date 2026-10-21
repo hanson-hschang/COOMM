@@ -23,7 +23,7 @@ from coomm.forces import DragForce
 from coomm.callback_func import RodCallBack, CylinderCallBack
 
 
-class BaseSimulator(BaseSystemCollection, Constraints, Connections, Forcing, CallBacks):
+class BaseSimulator(BaseSystemCollection, Constraints, Contact, Forcing, Damping, CallBacks):
     pass
 
 
@@ -67,6 +67,9 @@ class ArmEnvironment:
         radius = np.linspace(radius_base, radius_tip, n_elements + 1)
         radius_mean = (radius[:-1] + radius[1:]) / 2
         damp_coefficient = 0.05
+        damp_coefficient_rotational = 0.05
+        nu = damp_coefficient * ((radius_mean / radius_base) ** 2)
+        nu_for_torques = damp_coefficient_rotational * ((radius_mean / radius_base) ** 4)
 
         self.shearable_rod = CosseratRod.straight_rod(
             n_elements=n_elements,
@@ -76,22 +79,26 @@ class ArmEnvironment:
             base_length=base_length,
             base_radius=radius_mean.copy(),
             density=1050,
-            nu=damp_coefficient * ((radius_mean / radius_base) ** 2),
             youngs_modulus=10_000,
             shear_modulus=10_000 / (2 * (1 + 0.5)),
             # poisson_ratio=0.5, Default is 0.5
-            nu_for_torques=damp_coefficient * ((radius_mean / radius_base) ** 4),
         )
         self.simulator.append(self.shearable_rod)
 
         self.rod_parameters_dict = defaultdict(list)
+        self.simulator.dampen(self.shearable_rod).using(
+            AnalyticalLinearDamper,
+            translational_damping_constant=damp_coefficient,
+            rotational_damping_constant=damp_coefficient_rotational,
+            time_step=self.time_step,
+        )
         self.simulator.collect_diagnostics(self.shearable_rod).using(
             RodCallBack, step_skip=self.step_skip, callback_params=self.rod_parameters_dict
         )
 
         """ Set up boundary conditions """
         self.simulator.constrain(self.shearable_rod).using(
-            OneEndFixedRod, constrained_position_idx=(0,), constrained_director_idx=(0,)
+            OneEndFixedBC, constrained_position_idx=(0,), constrained_director_idx=(0,)
         )
 
         return base_length, radius

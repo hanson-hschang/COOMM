@@ -44,9 +44,9 @@ class Environment(ArmEnvironment):
 
         """ Set up boundary and contact conditions """
         self.simulator.constrain(self.cylinder).using(
-            el.OneEndFixedRod, constrained_position_idx=(0,), constrained_director_idx=(0,)
+            el.OneEndFixedBC, constrained_position_idx=(0,), constrained_director_idx=(0,)
         )
 
-        self.simulator.connect(self.shearable_rod, self.cylinder).using(
-            el.ExternalContact, 1e2, 0.1
+        self.simulator.detect_contact_between(self.shearable_rod, self.cylinder).using(
+            el.RodCylinderContact, k=1e2, nu=0.1
         )
